@@ -1,0 +1,84 @@
+PODS:
+  - FingerprintPro (2.13.0)
+  - Flutter (1.0.0)
+  - flutter_inappwebview_ios (0.0.1):
+    - Flutter
+    - flutter_inappwebview_ios/Core (= 0.0.1)
+    - OrderedSet (~> 6.0.3)
+  - flutter_inappwebview_ios/Core (0.0.1):
+    - Flutter
+    - OrderedSet (~> 6.0.3)
+  - globxpay_auth_sdk (0.0.1):
+    - Flutter
+  - IDWise (6.7.2):
+    - FingerprintPro (= 2.13.0)
+    - Shield-Ptr (= 1.5.57)
+  - idwise_flutter_sdk (6.7.2):
+    - Flutter
+    - IDWise (= 6.7.2)
+  - json-enum (1.2.3)
+  - jsonlogic (1.2.4):
+    - json-enum (~> 1.2.3)
+  - Mixpanel-swift (6.4.0):
+    - jsonlogic (~> 1.2.0)
+    - Mixpanel-swift/Complete (= 6.4.0)
+    - MixpanelSwiftCommon (~> 1.0.0)
+  - Mixpanel-swift/Complete (6.4.0):
+    - jsonlogic (~> 1.2.0)
+    - MixpanelSwiftCommon (~> 1.0.0)
+  - mixpanel_flutter (2.8.0):
+    - Flutter
+    - Mixpanel-swift (= 6.4.0)
+  - MixpanelSwiftCommon (1.0.1)
+  - OrderedSet (6.0.3)
+  - Shield-Ptr (1.5.57)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
+  - globxpay_auth_sdk (from `.symlinks/plugins/globxpay_auth_sdk/ios`)
+  - idwise_flutter_sdk (from `.symlinks/plugins/idwise_flutter_sdk/ios`)
+  - mixpanel_flutter (from `.symlinks/plugins/mixpanel_flutter/ios`)
+
+SPEC REPOS:
+  https://github.com/idwise/ios-sdk:
+    - IDWise
+  trunk:
+    - FingerprintPro
+    - json-enum
+    - jsonlogic
+    - Mixpanel-swift
+    - MixpanelSwiftCommon
+    - OrderedSet
+    - Shield-Ptr
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_inappwebview_ios:
+    :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
+  globxpay_auth_sdk:
+    :path: ".symlinks/plugins/globxpay_auth_sdk/ios"
+  idwise_flutter_sdk:
+    :path: ".symlinks/plugins/idwise_flutter_sdk/ios"
+  mixpanel_flutter:
+    :path: ".symlinks/plugins/mixpanel_flutter/ios"
+
+SPEC CHECKSUMS:
+  FingerprintPro: 2f419138022451a72f783db9c94967f5a68e9977
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_inappwebview_ios: 6f63631e2c62a7c350263b13fa5427aedefe81d4
+  globxpay_auth_sdk: aa8e06cabdd68b177ec34bda1a01d0f71aa13479
+  IDWise: 33288b344f24af80079f92d82901e4b5994ce6df
+  idwise_flutter_sdk: e9f4cdad654f73ae6e05404982bfa8553a83dce1
+  json-enum: 57ad746d2f0d7852796e9aa50267bd84a778222e
+  jsonlogic: 006f892470384401b8ca5b5d8d4cdadb3a0d5c9b
+  Mixpanel-swift: 9eb2ea2d0463970687c984e07040669f787b7a49
+  mixpanel_flutter: 9214a5f06b0290e54a2667ee7e92ec381f3d3afa
+  MixpanelSwiftCommon: 6fc461403945422a2e1d0989d712c0db2c26ecdb
+  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
+  Shield-Ptr: 0c49d80f465a7d6fd8ecd2930a9eefab3adc2962
+
+PODFILE CHECKSUM: 4d1d8b4d0769a743ec4ddca91edc117193f095ee
+
+COCOAPODS: 1.16.2

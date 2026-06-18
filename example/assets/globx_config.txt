@@ -1,0 +1,46 @@
+BASE_URL=<<Will be provided by GlobXpay>>
+APPLICATION_ID=<<Will be provided by GlobXpay>>
+RECAPTCHA_API_KEY=<<Will be provided by GlobXpay>>
+LOGO_PATH=<<Will be provided by GlobXpay>>
+IS_PRODUCTION=<<Will be provided by GlobXpay>>
+
+JORDANIANIDDB=<<Will be provided by GlobXpay>>
+MILITARYCARDIDDB=<<Will be provided by GlobXpay>>
+PASSPOETIDDB=<<Will be provided by GlobXpay>>
+SONSOFGAZAIDDB=<<Will be provided by GlobXpay>>
+RESIDENTCARDIDDB=<<Will be provided by GlobXpay>>
+SONSOFJORDANIANWOMENIDDB=<<Will be provided by GlobXpay>>
+SYRIANREFEGUIECARDIDDB=<<Will be provided by GlobXpay>>
+TRAVELDOCUMENTIDDB=<<Will be provided by GlobXpay>>
+
+JORDANIANCODE=<<Will be provided by GlobXpay>>
+MILITARYCARDCODE=<<Will be provided by GlobXpay>>
+PASSPOETCODE=<<Will be provided by GlobXpay>>
+SONSOFGAZACODE=<<Will be provided by GlobXpay>>
+RESIDENTCARDCODE=<<Will be provided by GlobXpay>>
+SONSOFJORDANIANWOMENCODE=<<Will be provided by GlobXpay>>
+SYRIANREFEGUIECARDCODE=<<Will be provided by GlobXpay>>
+TRAVELDOCUMENTCODE=<<Will be provided by GlobXpay>>
+
+JORDANIANFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+MILITARYCARDFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+PASSPOETFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+SONSOFGAZAFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+RESIDENTCARDFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+SONSOFJORDANIANWOMENFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+SYRIANREFEGUIECARDFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+TRAVELDOCUMENTFLOWSTAGINGKEY=<<Will be provided by GlobXpay>>
+
+JORDANIANFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+MILITARYCARDFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+PASSPOETFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+SONSOFGAZAFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+RESIDENTCARDFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+SONSOFJORDANIANWOMENFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+SYRIANREFEGUIECARDFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+TRAVELDOCUMENTFLOWPRODUCTIONKEY=<<Will be provided by GlobXpay>>
+
+JOURNEY_ID=<<Will be provided by GlobXpay>>
+STEP_ID_DOCUMENT=<<Will be provided by GlobXpay>>
+IDWISE_CLIENT_KEY_SATGING=<<Will be provided by GlobXpay>>
+IDWISE_CLIENT_KEY_PRODUCTION=<<Will be provided by GlobXpay>>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow all domains for reCAPTCHA to work properly -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <!-- Trust preinstalled CAs -->
+            <certificates src="system" />
+            <!-- Trust user-added CAs (for development/debugging) -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Specific domains for Google reCAPTCHA -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">google.com</domain>
+        <domain includeSubdomains="true">gstatic.com</domain>
+        <domain includeSubdomains="true">googleapis.com</domain>
+        <domain includeSubdomains="true">recaptcha.net</domain>
+    </domain-config>
+</network-security-config>
