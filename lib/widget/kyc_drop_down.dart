@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+
 import '../../data/get_kyc_response_model.dart';
 import '../constants/app_colors.dart';
 import '../language_manager.dart';
@@ -29,7 +30,7 @@ class _KycDropDownWidgetState extends State<KycDropDownWidget> {
         value: selectedValue,
         items: widget.answers
             .map(
-              (e) => DropdownMenuItem(
+              (e) => DropdownItem(
                 value: e.kycAnswer?.id ?? 0,
                 child: Text(
                   LanguageManager.currentLanguage == 'ar'
