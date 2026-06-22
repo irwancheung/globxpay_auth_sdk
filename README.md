@@ -142,9 +142,16 @@ await GlobXpayAuthSdkPlatform.instance.initializeSdk(
   InitSdkModel(
     language: GlobXLanguage.en,
     primaryColor: Colors.red,
+    // Use registration for a fresh sign-up flow
+    // Use firstTimeLogin when using CreateAccountDynamic API
+    flowMode: GlobXSdkFlowMode.registration, 
   ),
 );
 ```
+
+### 💡 Flow Modes:
+- `GlobXSdkFlowMode.registration`: Use this when starting the registration process from scratch.
+- `GlobXSdkFlowMode.firstTimeLogin`: Use this when your application logic involves the `CreateAccountDynamic` API.
 
 ---
 

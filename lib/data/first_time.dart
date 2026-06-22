@@ -1,5 +1,3 @@
-
-
 import '../models/general_response.dart';
 
 final class FirstTimeLoginModel {
@@ -28,5 +26,19 @@ final class FirstTimeLoginModel {
     iDwiseVerified = json['iDwiseVerified'];
     isKycRequired = json['isKycRequired'];
     isKycVerified = json['isKycVerified'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isSuccess': isSuccess,
+      'errors': errors?.map((error) => error.toJson()).toList(),
+      'code': code,
+      'message': message,
+      'languageTypeId': languageTypeId,
+      'iDwiseRequired': iDwiseRequired,
+      'iDwiseVerified': iDwiseVerified,
+      'isKycRequired': isKycRequired,
+      'isKycVerified': isKycVerified,
+    };
   }
 }

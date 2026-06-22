@@ -53,7 +53,7 @@ class ImageBuilder extends StatelessWidget {
     }
 
     // Handle SVG files
-    if (image.toLowerCase().endsWith('.svg')) {
+    else if (image.toLowerCase().endsWith('.svg')) {
       return SvgPicture.asset(
         image,
         package: package,
@@ -67,7 +67,7 @@ class ImageBuilder extends StatelessWidget {
     }
 
     // Handle network images
-    if (image.startsWith('http://') || image.startsWith('https://')) {
+   else if (image.startsWith('http://') || image.startsWith('https://')) {
       return Image.network(
         image,
         fit: fit ?? BoxFit.cover,

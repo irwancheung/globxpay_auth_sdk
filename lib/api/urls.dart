@@ -27,39 +27,14 @@ sealed class Urls {
     // Load URLs from globx_config
     base = Network.baseURL;
     baseAPI = '$base/api/v1';
-    _updateUrls();
     log(base);
-  }
-
-  static void _updateUrls() {
-    // Account
-    account = '$baseAPI/Account';
-    loginUrl = '$account/Login';
-    getPersonalInfo = '$account/GetPersonalInfo';
-    getPersonalInfoNew = '$account/GetPersonalInfo_New';
-    getPersonalInfoSon = '$account/GetPersonalInfo_Son';
-
-    // Lookup
-    lookup = '$baseAPI/Lookup';
-    getNationalitiesUrl = '$lookup/GetNationalities';
-    getLookupDetailsUrl = '$lookup/GetLookupDetails';
-    getCountriesUrl = '$lookup/GetCountries';
-    getCountryCitiesUrl = '$lookup/GetCountryCities';
-    lookupListOtpMethod = '$lookup/LookupListOtpMethod';
-
-    // Customer
-    customer = '$baseAPI/Customer';
-    customerRegistrationUrl = '$customer/CustomerRegistration';
-    getKYCUrl = '$customer/GetKYC';
-    submitKYCUrl = '$customer/SubmitKYC';
-    updateIDwiseInfo = '$customer/UpdateIDwiseInfo';
-    updateIDwiseInfoV1 = '$customer/UpdateIDwiseInfoV1';
-    recaptchaValidateAsync = '$customer/RecaptchaValidateAsync';
   }
 
   // Account
   static String account = '$baseAPI/Account';
   static String loginUrl = '$account/Login';
+  static String loginAfterRegister = '$account/ProccessLoginAfterRegister';
+  static String firstTimeLogin = '$account/FirstTimeLogin';
   static String getPersonalInfo = "$account/GetPersonalInfo";
   static String getPersonalInfoNew = "$account/GetPersonalInfo_New";
   static String getPersonalInfoSon = "$account/GetPersonalInfo_Son";

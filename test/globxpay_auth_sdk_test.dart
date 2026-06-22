@@ -1,7 +1,9 @@
-import 'package:flutter/src/widgets/page_view.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:globxpay_auth_sdk/data/first_time.dart';
 import 'package:globxpay_auth_sdk/data/id_wise/document_type.dart';
 import 'package:globxpay_auth_sdk/data/kyc_data_holder_models.dart';
+import 'package:globxpay_auth_sdk/data/login_response.dart';
 import 'package:globxpay_auth_sdk/globxpay_auth_sdk.dart';
 import 'package:globxpay_auth_sdk/globxpay_auth_sdk_platform_interface.dart';
 import 'package:globxpay_auth_sdk/globxpay_auth_sdk_method_channel.dart';
@@ -31,6 +33,9 @@ class MockGlobxpayAuthSdkPlatform
   late PageController registrationPageController;
 
   @override
+  late PageController firstTimeLoginPageController;
+
+  @override
   late int userId;
 
   @override
@@ -45,6 +50,7 @@ class MockGlobxpayAuthSdkPlatform
   void checkedPersonalInfoSonFromApi({
     required String nationalNumber,
     required String birthDate,
+    required String civilNo,
     required Function(Map<String, dynamic> data) onSuccess,
     required Function(String error) onError,
     required Function(bool isLoading) onLoading,
@@ -125,6 +131,41 @@ class MockGlobxpayAuthSdkPlatform
   Future<void> initializeSdk(InitSdkModel initSDK) {
     // TODO: implement initializeSdk
     throw UnimplementedError();
+  }
+
+  @override
+  void firstTimeLogin({
+    required String phoneNumber,
+    required int stepId,
+    String otp = '',
+    String newPassword = '',
+    bool isResendOTP = false,
+    required Function(FirstTimeLoginModel firstTimeLoginModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    // TODO: implement firstTimeLogin
+  }
+
+  @override
+  void loginAfterRegister({
+    required String phoneNumber,
+    required String password,
+    String fcmToken = '',
+    required Function(LoginResponseModel loginResponseModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    // TODO: implement loginAfterRegister
+  }
+
+  @override
+  void updateIDWiseInfo({
+    required Function() onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    // TODO: implement updateIDWiseInfo
   }
 
   @override
@@ -267,6 +308,18 @@ class MockGlobxpayAuthSdkPlatform
 
   @override
   late String selectedChannelMethod;
+
+  @override
+  final ValueNotifier<bool> sdkLoading = ValueNotifier<bool>(false);
+
+  @override
+  GlobXSdkFlowMode flowMode = GlobXSdkFlowMode.registration;
+
+  @override
+  FirstTimeLoginModel? firstTimeLoginModel;
+
+  @override
+  String accessToken = '';
 }
 
 void main() {
@@ -283,5 +336,11 @@ void main() {
     GlobxpayAuthSdkPlatform.instance = fakePlatform;
 
     expect(await globxpayAuthSdkPlugin.getPlatformVersion(), '42');
+  });
+
+  test('InitSdkModel defaults to registration flow', () {
+    final initSdkModel = InitSdkModel();
+
+    expect(initSdkModel.flowMode, GlobXSdkFlowMode.registration);
   });
 }

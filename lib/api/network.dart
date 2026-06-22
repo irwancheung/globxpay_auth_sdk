@@ -127,8 +127,8 @@ sealed class Network {
 
       if (kDebugMode) {
         print('✅ Config loaded: ${_config.length} keys total');
-        print('✅ BASE_URL=${baseURL}');
-        print('✅ APPLICATION_ID=${applicationId}');
+        print('✅ BASE_URL=$baseURL');
+        print('✅ APPLICATION_ID=$applicationId');
         final recaptchaKey = _config["RECAPTCHA_API_KEY"];
         print(
           '✅ RECAPTCHA_API_KEY=${recaptchaKey?.isEmpty == true ? "EMPTY" : (recaptchaKey != null && recaptchaKey.length > 20 ? "${recaptchaKey.substring(0, 20)}..." : recaptchaKey)}',

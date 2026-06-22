@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
 import 'package:globxpay_auth_sdk/api/urls.dart';
 import 'package:globxpay_auth_sdk/models/lookup_list_otp_method.dart';
@@ -8,8 +10,10 @@ import 'api/network.dart';
 import 'data/get_cities_by_countries.dart';
 import 'data/get_kyc_response_model.dart';
 import 'data/get_personal_info_son.dart';
+import 'data/first_time.dart';
 import 'data/id_wise/document_type.dart';
 import 'data/kyc_data_holder_models.dart';
+import 'data/login_response.dart';
 import 'data/register_response.dart';
 import 'data/submit_kyc_request_model.dart';
 import 'globxpay_auth_sdk_platform_interface.dart';
@@ -17,14 +21,26 @@ import 'init_sdk_model.dart';
 import 'language_manager.dart';
 import 'models/general_response.dart';
 import 'models/get_lookup_details.dart';
+import 'registration_data.dart';
 
 /// An implementation of [GlobxpayAuthSdkPlatform] that uses method channels.
 class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
+  @visibleForTesting
+  final methodChannel = const MethodChannel('globxpay_auth_sdk');
+
   /// The method channel used to interact with the native platform.
   String _logoPath = '';
 
   MethodChannelGlobxpayAuthSdk() {
     print('✅ MethodChannelGlobxpayAuthSdk instance created');
+  }
+
+  @override
+  Future<String?> getPlatformVersion() async {
+    final version = await methodChannel.invokeMethod<String>(
+      'getPlatformVersion',
+    );
+    return version;
   }
 
   @override
@@ -37,6 +53,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
 
     // Set language en
     LanguageManager.setLanguage(initSDK.language);
+    flowMode = initSDK.flowMode;
 
     // Update logo from config file
     updateLogo(Network.logoPath);
@@ -122,6 +139,276 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
       onSuccess('Code resent successfully');
     } catch (error) {
       onError(error.toString());
+    } finally {
+      onLoading(false);
+    }
+  }
+
+  @override
+  void loginAfterRegister({
+    required String phoneNumber,
+    required String password,
+    String fcmToken = '',
+    required Function(LoginResponseModel loginResponseModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) async {
+    onLoading(true);
+    try {
+      final response = await Network.post(
+        url: Urls.loginAfterRegister,
+        enableMixpanel: true,
+        data: {
+          'userName': phoneNumber.trim(),
+          'pin': password.trim(),
+          'applicationId': Network.applicationId,
+          'IsUserNamePhoneNumber': true,
+          'fcmToken': fcmToken.trim(),
+          'latitude': '',
+          'longitude': '',
+          'os': Platform.isIOS ? 'IOS' : 'android',
+          'deviceId': '',
+          'deviceType': '',
+          'isBiometricLogin': false,
+          'applicationVersion': '',
+        },
+      );
+
+      if (response.data != null) {
+        final loginResponseModel = LoginResponseModel.fromJson(response.data);
+
+        if (loginResponseModel.isSuccess == true) {
+          GlobxpayAuthSdkPlatform.instance.accessToken =
+              loginResponseModel.accessToken ?? '';
+          GlobxpayAuthSdkPlatform.instance.userId =
+              loginResponseModel.userId ?? 0;
+          onSuccess(loginResponseModel);
+        } else {
+          final errorMessage = loginResponseModel.errors?.isNotEmpty == true
+              ? loginResponseModel.errors!.first.getDescription()
+              : 'Login failed';
+          onError(errorMessage);
+        }
+      } else {
+        onError('Empty response from server');
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response?.data != null) {
+          try {
+            final errorResponse = LoginResponseModel.fromJson(
+              error.response!.data,
+            );
+            final errorMessage = errorResponse.errors?.isNotEmpty == true
+                ? errorResponse.errors!.first.getDescription()
+                : 'Request failed';
+            onError(errorMessage);
+            return;
+          } catch (_) {
+            onError('Request failed');
+            return;
+          }
+        }
+        onError('Network error: ${error.message}');
+      } else {
+        onError(error.toString());
+      }
+    } finally {
+      onLoading(false);
+    }
+  }
+
+  @override
+  void firstTimeLogin({
+    required String phoneNumber,
+    required int stepId,
+    String otp = '',
+    String newPassword = '',
+    bool isResendOTP = false,
+    required Function(FirstTimeLoginModel firstTimeLoginModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) async {
+    onLoading(true);
+    try {
+      final response = await Network.post(
+        url: Urls.firstTimeLogin,
+        enableMixpanel: true,
+        data: {
+          'phoneNumber': phoneNumber.trim(),
+          'applicationId': Network.applicationId,
+          'stepId': stepId,
+          'otp': otp.trim(),
+          'newPassword': newPassword.trim(),
+          'otpMethodCode': GlobxpayAuthSdkPlatform.instance.codeMethod ?? 0,
+        },
+      );
+
+      if (response.data != null) {
+        final firstTimeLoginModel = FirstTimeLoginModel.fromJson(response.data);
+
+        if (firstTimeLoginModel.isSuccess == true) {
+          this.firstTimeLoginModel = firstTimeLoginModel;
+          onSuccess(firstTimeLoginModel);
+        } else {
+          final errorMessage = firstTimeLoginModel.errors?.isNotEmpty == true
+              ? firstTimeLoginModel.errors!.first.getDescription()
+              : 'First-time login failed';
+          onError(errorMessage);
+        }
+      } else {
+        onError('Empty response from server');
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response?.data != null) {
+          try {
+            final errorResponse = FirstTimeLoginModel.fromJson(
+              error.response!.data,
+            );
+            final errorMessage = errorResponse.errors?.isNotEmpty == true
+                ? errorResponse.errors!.first.getDescription()
+                : 'Request failed';
+            onError(errorMessage);
+            return;
+          } catch (_) {
+            onError('Request failed');
+            return;
+          }
+        }
+        onError('Network error: ${error.message}');
+      } else {
+        onError(error.toString());
+      }
+    } finally {
+      onLoading(false);
+    }
+  }
+
+  @override
+  void updateIDWiseInfo({
+    required Function() onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) async {
+    onLoading(true);
+    try {
+      final documentType =
+          GlobxpayAuthSdkPlatform.instance.registrationDocumentType;
+      final isPassportFlow = documentType?.code == '022';
+      final firstNameAr = RegistrationData.getfirstNameAr();
+      final secondNameAr = RegistrationData.getsecondtNameAr();
+      final thirdNameAr = RegistrationData.getthirdNameAr();
+      final lastNameAr = RegistrationData.getlastNameAr();
+
+      final data = <String, dynamic>{
+        'applicationId': Network.applicationId,
+        'firstNameEn': isPassportFlow
+            ? null
+            : RegistrationData.getfirstNameEn(),
+        'secondNameEn': isPassportFlow
+            ? null
+            : RegistrationData.getsecondtNameEn(),
+        'thirdNameEn': isPassportFlow
+            ? null
+            : RegistrationData.getthirdNameEn(),
+        'lastNameEn': isPassportFlow ? null : RegistrationData.getlastNameEn(),
+        'firstNameAr': isPassportFlow
+            ? null
+            : firstNameAr.isNotEmpty
+            ? firstNameAr
+            : RegistrationData.getfirstNameEn(),
+        'secondNameAr': isPassportFlow
+            ? null
+            : secondNameAr.isNotEmpty
+            ? secondNameAr
+            : RegistrationData.getsecondtNameEn(),
+        'thirdNameAr': isPassportFlow
+            ? null
+            : thirdNameAr.isNotEmpty
+            ? thirdNameAr
+            : RegistrationData.getthirdNameEn(),
+        'lastNameAr': isPassportFlow
+            ? null
+            : lastNameAr.isNotEmpty
+            ? lastNameAr
+            : RegistrationData.getlastNameEn(),
+        'os': Platform.isIOS ? 'IOS' : 'Android',
+        'idNumber': isPassportFlow
+            ? null
+            : RegistrationData.getnationalNumber().isNotEmpty
+            ? RegistrationData.getnationalNumber()
+            : RegistrationData.getdocIdNumber(),
+        'nationalityCode': isPassportFlow
+            ? null
+            : documentType?.code == '608'
+            ? 'JOR'
+            : documentType?.code == '623'
+            ? 'SYR'
+            : RegistrationData.getNationalityCode(),
+        'identityTypeId': documentType?.documentTypeDB,
+        'expiredDate': RegistrationData.getidExpiery(),
+        'birthDate': isPassportFlow ? null : RegistrationData.getdateOfBirth(),
+        'placeOfBirth': isPassportFlow
+            ? null
+            : RegistrationData.getPlaceOfBirth(),
+        'front': RegistrationData.getdocImageFront(),
+        'back': documentType?.id == 3
+            ? null
+            : RegistrationData.getdocImageBack(),
+        'selfi': RegistrationData.getselfieImage(),
+        'phoneNumber': RegistrationData.getPhoneNumber(),
+        'documentNumber': RegistrationData.getdocIdNumber(),
+        'otpMethodCode': GlobxpayAuthSdkPlatform.instance.codeMethod ?? 0,
+      };
+
+      if (isPassportFlow) {
+        data.remove('expiredDate');
+      }
+
+      final response = await Network.post(
+        url: isPassportFlow ? Urls.updateIDwiseInfoV1 : Urls.updateIDwiseInfo,
+        enableMixpanel: true,
+        data: data,
+      );
+
+      if (response.data != null) {
+        final generalResponseModel = GeneralResponseModel.fromJson(
+          response.data,
+        );
+
+        if (generalResponseModel.isSuccess == true) {
+          onSuccess();
+        } else {
+          final errorMessage = generalResponseModel.errors?.isNotEmpty == true
+              ? generalResponseModel.errors!.first.getDescription()
+              : 'Failed to update IDWise info';
+          onError(errorMessage);
+        }
+      } else {
+        onError('Empty response from server');
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response?.data != null) {
+          try {
+            final errorResponse = GeneralResponseModel.fromJson(
+              error.response!.data,
+            );
+            final errorMessage = errorResponse.errors?.isNotEmpty == true
+                ? errorResponse.errors!.first.getDescription()
+                : 'Request failed';
+            onError(errorMessage);
+            return;
+          } catch (_) {
+            onError('Request failed');
+            return;
+          }
+        }
+        onError('Network error: ${error.message}');
+      } else {
+        onError(error.toString());
+      }
     } finally {
       onLoading(false);
     }
@@ -232,7 +519,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
         "cityId": cityId == 0 ? null : cityId,
         "countryId": countryId == 0 ? null : countryId,
         "isAcutalBeneficiary": isActualBeneficiary,
-        "genderId" : gender,
+        "genderId": gender,
         "actualBeneficiary": {
           "beneficiaryName": beneficiaryName.trim(),
           "beneficiaryIdentityTypeId": beneficiaryIdentityTypeId,
@@ -724,6 +1011,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
   void checkedPersonalInfoSonFromApi({
     required String nationalNumber,
     required String birthDate,
+    required String civilNo,
     required Function(Map<String, dynamic> data) onSuccess,
     required Function(String error) onError,
     required Function(bool isLoading) onLoading,
@@ -735,6 +1023,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
         query: {
           "National_No": nationalNumber.trim(),
           "BrthDate": birthDate.trim(),
+          "civilNo": civilNo,
         },
       );
 
@@ -1096,6 +1385,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
     print('🔵 Base URL: ${Network.baseURL}');
 
     onLoading(true);
+    changeLoading(true, onLoading: (_) {});
     print('🔵 onLoading(true) called');
 
     try {
@@ -1161,6 +1451,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
     } finally {
       print('🔵 onLoading(false) called');
       onLoading(false);
+      changeLoading(false, onLoading: (_) {});
     }
   }
 
@@ -1188,7 +1479,9 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
     bool value, {
     required Function(bool isLoading) onLoading,
   }) {
+    print('🔵 [SDK Platform] changeLoading called: $value');
     Network.isLoading = value;
+    sdkLoading.value = value;
     onLoading(value);
   }
 }

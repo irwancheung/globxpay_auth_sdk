@@ -40,123 +40,125 @@ class _ConfirmPassportScreenState extends State<ConfirmPassportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.5.h),
-              child: ImageBuilder(
-                image: AppAssets.secondStepRegisterSVG,
-                package: 'globxpay_auth_sdk',
-                fit: BoxFit.fill,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.5.h),
+                child: ImageBuilder(
+                  image: AppAssets.secondStepRegisterSVG,
+                  package: 'globxpay_auth_sdk',
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
-            SizedBox(height: 2.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 3.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(height: 2.h),
-                  Text(
-                    LanguageManager.getText('dateOfBirth'),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+              SizedBox(height: 2.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 3.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 2.h),
+                    Text(
+                      LanguageManager.getText('dateOfBirth'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    RegistrationData.getdateOfBirth(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+                    Text(
+                      RegistrationData.getdateOfBirth(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    LanguageManager.getText('nationalNumber'),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+                    SizedBox(height: 2.h),
+                    Text(
+                      LanguageManager.getText('nationalNumber'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    RegistrationData.getnationalNumber(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+                    Text(
+                      RegistrationData.getnationalNumber(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    LanguageManager.getText('passportExpiryDate'),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+                    SizedBox(height: 2.h),
+                    Text(
+                      LanguageManager.getText('passportExpiryDate'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    RegistrationData.getidExpiery(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.black,
-                      fontSize: 12.0.sp,
+                    Text(
+                      RegistrationData.getidExpiery(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.black,
+                        fontSize: 12.0.sp,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 3.h),
-                  Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(2.h),
-                      child:
-                          RegistrationData.getpassportImageFront().isNotEmpty ||
-                              RegistrationData.getpassportImageFront()
-                                  .isNotEmpty
-                          ? ImageBuilder(
-                              image: RegistrationData.getpassportImageFront(),
-                              isBase64: true,
-                              height: 25.h,
-                              width: 65.w,
-                            )
-                          : const SizedBox(),
+                    SizedBox(height: 3.h),
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2.h),
+                        child:
+                            RegistrationData.getpassportImageFront().isNotEmpty ||
+                                RegistrationData.getpassportImageFront()
+                                    .isNotEmpty
+                            ? ImageBuilder(
+                                image: RegistrationData.getpassportImageFront(),
+                                isBase64: true,
+                                height: 25.h,
+                                width: 65.w,
+                              )
+                            : const SizedBox(),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 1.5.h),
-                  Center(
-                    child: Material(
-                      elevation: 1.0,
-                      borderRadius: BorderRadius.circular(1.2.h),
-                      color: AppColors.primary,
-                      child: MaterialButton(
-                        height: 6.5.h,
-                        minWidth: 40.w,
-                        padding: const EdgeInsets.fromLTRB(
-                          20.0,
-                          15.0,
-                          20.0,
-                          15.0,
-                        ),
-                        onPressed: () {
-                          GlobxpayAuthSdkPlatform.instance.registrationPageController
-                              .jumpToPage(10);
-                        },
-                        child: Text(
-                          LanguageManager.getText('confirm'),
-                          style: const TextStyle(color: AppColors.textGreyDark),
-                          textAlign: TextAlign.center,
+                    SizedBox(height: 1.5.h),
+                    Center(
+                      child: Material(
+                        elevation: 1.0,
+                        borderRadius: BorderRadius.circular(1.2.h),
+                        color: AppColors.primary,
+                        child: MaterialButton(
+                          height: 6.5.h,
+                          minWidth: 40.w,
+                          padding: const EdgeInsets.fromLTRB(
+                            20.0,
+                            15.0,
+                            20.0,
+                            15.0,
+                          ),
+                          onPressed: () {
+                            GlobxpayAuthSdkPlatform.instance.registrationPageController
+                                .jumpToPage(10);
+                          },
+                          child: Text(
+                            LanguageManager.getText('confirm'),
+                            style: const TextStyle(color: AppColors.textGreyDark),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 2.h),
-                ],
+                    SizedBox(height: 2.h),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

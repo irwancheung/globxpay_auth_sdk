@@ -5,7 +5,9 @@ import 'package:globxpay_auth_sdk/models/lookup_list_otp_method.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'data/id_wise/document_type.dart';
+import 'data/first_time.dart';
 import 'data/kyc_data_holder_models.dart';
+import 'data/login_response.dart';
 import 'globxpay_auth_sdk_method_channel.dart';
 import 'init_sdk_model.dart';
 
@@ -34,6 +36,7 @@ abstract class GlobxpayAuthSdkPlatform extends PlatformInterface {
   }
 
   late PageController registrationPageController;
+  late PageController firstTimeLoginPageController;
   RegistrationDocumentTypeMode? registrationDocumentType;
   String password = '';
   bool isCompleteSummary = false;
@@ -41,6 +44,15 @@ abstract class GlobxpayAuthSdkPlatform extends PlatformInterface {
   int userId = 0;
   int? codeMethod;
   String selectedChannelMethod = 'SMS';
+  GlobXSdkFlowMode flowMode = GlobXSdkFlowMode.registration;
+  FirstTimeLoginModel? firstTimeLoginModel;
+
+  /// Bearer token for authenticated first-time-login calls (e.g. SubmitKYC).
+  ///
+  /// Populated (together with [userId]) by [loginAfterRegister], which the
+  /// first-time-login KYC submit calls right after FirstTimeLogin step 3.
+  String accessToken = '';
+  final ValueNotifier<bool> sdkLoading = ValueNotifier<bool>(false);
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
@@ -123,6 +135,29 @@ abstract class GlobxpayAuthSdkPlatform extends PlatformInterface {
     throw UnimplementedError('reSendCode() has not been implemented.');
   }
 
+  /// Execute a first-time-login API step.
+  void firstTimeLogin({
+    required String phoneNumber,
+    required int stepId,
+    String otp = '',
+    String newPassword = '',
+    bool isResendOTP = false,
+    required Function(FirstTimeLoginModel firstTimeLoginModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    throw UnimplementedError('firstTimeLogin() has not been implemented.');
+  }
+
+  /// Updates the first-time-login IDWise result data.
+  void updateIDWiseInfo({
+    required Function() onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    throw UnimplementedError('updateIDWiseInfo() has not been implemented.');
+  }
+
   /// Complete registration step three with full user details
   void registerStepThree({
     required int stepId,
@@ -171,6 +206,21 @@ abstract class GlobxpayAuthSdkPlatform extends PlatformInterface {
     throw UnimplementedError('registerStepThree() has not been implemented.');
   }
 
+  /// Authenticate right after FirstTimeLogin step 3 (mirrors the mobile
+  /// `ProccessLoginAfterRegister` call) so the first-time-login KYC submit
+  /// has a valid [userId] + [accessToken]. On success this populates both
+  /// fields on the platform instance.
+  void loginAfterRegister({
+    required String phoneNumber,
+    required String password,
+    String fcmToken = '',
+    required Function(LoginResponseModel loginResponseModel) onSuccess,
+    required Function(String error) onError,
+    required Function(bool isLoading) onLoading,
+  }) {
+    throw UnimplementedError('loginAfterRegister() has not been implemented.');
+  }
+
   /// Get purpose of opening account lookup data
   void getPurposeOfOpeningAccountLookup({
     required Function(List<Map<String, dynamic>> result) onSuccess,
@@ -213,6 +263,7 @@ abstract class GlobxpayAuthSdkPlatform extends PlatformInterface {
   void checkedPersonalInfoSonFromApi({
     required String nationalNumber,
     required String birthDate,
+    required String civilNo,
     required Function(Map<String, dynamic> data) onSuccess,
     required Function(String error) onError,
     required Function(bool isLoading) onLoading,

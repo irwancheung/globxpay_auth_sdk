@@ -144,6 +144,17 @@ class LanguageManager {
     "enterVerificationCode": "ادخل رمز التحقق",
     "resendVerificationCode": "إعادة إرسال رمز التحقق",
     "backToFirstScreen": " العودة إلى الشاشة الأولى",
+
+    "jordanianID": "هوية احوال مدنية",
+    "militaryCard": "بطاقة الجيش",
+    "passport": "جواز سفر",
+    "gaza": "بطاقة ابناء غزة",
+    "residentID": "وثيقة إقامة",
+    "sonOfJordanianWomen": "بطاقة تعريفية لابناء الأردنيات",
+    "syrianRefugeeCard": "بطاقة اللاجئين السوريين",
+    "CertificateOfAppointment": "شهادة تعيين",
+    "travelDocument": "وثيقة سفر مؤقتة",
+
   };
 
   static const Map<String, String> en = {
@@ -291,6 +302,16 @@ class LanguageManager {
     "wrongMobileNumber": "Wrong Mobile Number?",
     "enterVerificationCode": "Enter verification code",
     "backToFirstScreen": "Back to first screen",
+
+    "jordanianID": "National Card ID",
+    "militaryCard": "Military ID Card",
+    "passport": "Passport",
+    "gaza": "People of Gaza Strip ID Card",
+    "residentID": "Resident ID Card",
+    "sonOfJordanianWomen": "Identification card for children of Jordanian women",
+    "syrianRefugeeCard": "Syrian Refugee ID Card",
+    "travelDocument": "Travel Document",
+
   };
 
   /// Set current language

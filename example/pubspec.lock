@@ -149,10 +149,10 @@ packages:
     dependency: transitive
     description:
       name: dropdown_button2
-      sha256: "86a2944f62ab1521e40e2ba174ef6356eb980094c9ff7d840d98a6fc7986720e"
+      sha256: b0fe8d49a030315e9eef6c7ac84ca964250155a6224d491c1365061bc974a9e1
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-beta.6"
+    version: "2.3.9"
   fake_async:
     dependency: transitive
     description:
@@ -357,10 +357,10 @@ packages:
     dependency: transitive
     description:
       name: idwise_flutter_sdk
-      sha256: "914c8cf746522431904d4b14c128ad31a023dca84a8cdaa1b1155a8417708eb1"
+      sha256: "5a0a691c8641feb166b0121f4d5f98e5a6f9d57353af7d600a58b25b661414e0"
       url: "https://pub.dev"
     source: hosted
-    version: "6.7.2"
+    version: "6.7.6"
   image_picker:
     dependency: transitive
     description:

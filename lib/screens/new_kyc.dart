@@ -1613,6 +1613,88 @@ class _NewKycScreenState extends State<NewKycScreen> {
       _isSubmittingRegistration = true;
     });
 
+    // First-time-login has no registration session, so it must authenticate
+    // first (mirrors the mobile loginThroughRegister) to obtain a valid
+    // userId + accessToken, then SubmitKYC, then route to the first-time-login
+    // success page. Registration keeps the unchanged registerStepThree
+    // (CustomerRegistration) path below.
+    if (widget.isLoginNavigation) {
+      GlobxpayAuthSdkPlatform.instance.loginAfterRegister(
+        phoneNumber: RegistrationData.getPhoneNumber(),
+        password: GlobxpayAuthSdkPlatform.instance.password,
+        onSuccess: (_) {
+          GlobxpayAuthSdkPlatform.instance.submitKycApi(
+            userId: GlobxpayAuthSdkPlatform.instance.userId,
+            token: GlobxpayAuthSdkPlatform.instance.accessToken,
+            kycAnswers: deduplicatedAnswers
+                .map(
+                  (a) => <String, dynamic>{
+                    'answerId': a.answerId,
+                    'questionId': a.questionId,
+                    'freeText': a.freeText,
+                  },
+                )
+                .toList(),
+            cityId: cityId,
+            countryId: countryId,
+            sectorId: sectorsId,
+            usagePurposeId: purposeOfOpeninigId,
+            emailAddress: _email,
+            idNumber: RegistrationData.getnationalNumber().isNotEmpty
+                ? RegistrationData.getnationalNumber()
+                : RegistrationData.getdocIdNumber(),
+            phoneNumber: RegistrationData.getPhoneNumber(),
+            isActualBeneficiary: isRealBeneficiary,
+            beneficiaryName: nameOfActualBeneficary.text.trim(),
+            beneficiaryIdentityTypeId: selectedIdType,
+            beneficiaryIdImageFront: _beneficiaryIdTypeAnswerCode == '28'
+                ? ''
+                : frontProofImage,
+            beneficiaryIdImageBack: backProofImage,
+            beneficiaryPassportImage: frontProofImage,
+            beneficiaryRelation: relationshipOfActualBeneficary.text.trim(),
+            multiNationalityProof: multiNationalityProofImage,
+            onSuccess: () {
+              setState(() {
+                _isSubmittingRegistration = false;
+              });
+              if (mounted &&
+                  GlobxpayAuthSdkPlatform
+                      .instance
+                      .firstTimeLoginPageController
+                      .hasClients) {
+                GlobxpayAuthSdkPlatform.instance.firstTimeLoginPageController
+                    .jumpToPage(9);
+              }
+            },
+            onError: (error, errorCode) {
+              setState(() {
+                _isSubmittingRegistration = false;
+              });
+              Dialogs.errorDialog(context, message: error);
+            },
+            onLoading: (isLoading) {
+              setState(() {
+                _isSubmittingRegistration = isLoading;
+              });
+            },
+          );
+        },
+        onError: (error) {
+          setState(() {
+            _isSubmittingRegistration = false;
+          });
+          Dialogs.errorDialog(context, message: error);
+        },
+        onLoading: (isLoading) {
+          setState(() {
+            _isSubmittingRegistration = isLoading;
+          });
+        },
+      );
+      return;
+    }
+
     // Call registerStepThree from MethodChannelAuthSdk
     GlobxpayAuthSdkPlatform.instance.registerStepThree(
       stepId: 3,

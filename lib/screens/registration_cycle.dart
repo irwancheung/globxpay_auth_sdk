@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import '../api/network.dart';
 import '../globxpay_auth_sdk_platform_interface.dart';
@@ -29,6 +28,7 @@ import 'successfully_taken_selfie_passport.dart';
 import 'take_selfie.dart';
 import 'terms_and_condition.dart';
 import 'verify_mobile_number_screen.dart';
+import '../widget/waiting_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationCycleScreen extends StatefulWidget {
@@ -145,46 +145,56 @@ class _RegistrationCycleScreenState extends State<RegistrationCycleScreen> {
             );
           }
         },
-        child: PageView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          controller:
-              GlobxpayAuthSdkPlatform.instance.registrationPageController,
-          itemCount: 15,
-          // Total number of screens
-          itemBuilder: (context, index) => _buildScreen(index),
-          onPageChanged: (value) {
-            setState(() {
-              currentPage = value;
-            });
-            print('current page $value');
-            if (value == 6 || value == 7) {
-              GlobxpayAuthSdkPlatform.instance.changeLoading(
-                false,
+        child: ValueListenableBuilder<bool>(
+          valueListenable: GlobxpayAuthSdkPlatform.instance.sdkLoading,
+          builder: (context, isLoading, child) {
+            return Stack(
+              children: [
+                PageView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller:
+                      GlobxpayAuthSdkPlatform.instance.registrationPageController,
+                  itemCount: 15,
+                  // Total number of screens
+                  itemBuilder: (context, index) => _buildScreen(index),
+                  onPageChanged: (value) {
+                    setState(() {
+                      currentPage = value;
+                    });
+                    print('current page $value');
+                    if (value == 6 || value == 7) {
+                      GlobxpayAuthSdkPlatform.instance.changeLoading(
+                        false,
 
-                onLoading: (bool isLoading) {
-                  if (mounted) {
-                    setState(() {});
-                  }
-                },
-              );
-              clearSaved();
-              unloadSDK();
-              setupCallbacks();
-              //resumeJourney();
-            }
-            if (value == 8) {
-              GlobxpayAuthSdkPlatform.instance.changeLoading(
-                false,
+                        onLoading: (bool isLoading) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                      );
+                      clearSaved();
+                      unloadSDK();
+                      setupCallbacks();
+                      //resumeJourney();
+                    }
+                    if (value == 8) {
+                      GlobxpayAuthSdkPlatform.instance.changeLoading(
+                        false,
 
-                onLoading: (bool isLoading) {
-                  if (mounted) {
-                    setState(() {});
-                  }
-                },
-              );
-              clearSaved();
-              unloadSDK();
-            }
+                        onLoading: (bool isLoading) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                      );
+                      clearSaved();
+                      unloadSDK();
+                    }
+                  },
+                ),
+                if (isLoading) const WaitingScreen(),
+              ],
+            );
           },
         ),
       ),
@@ -448,8 +458,7 @@ class _RegistrationCycleScreenState extends State<RegistrationCycleScreen> {
           journeyInfo["journeyId"],
         );
         GlobxpayAuthSdkPlatform.instance.changeLoading(
-          false,
-
+          true,
           onLoading: (bool isLoading) {
             if (mounted) {
               setState(() {});
@@ -510,6 +519,14 @@ class _RegistrationCycleScreenState extends State<RegistrationCycleScreen> {
 
     _stepCallbacks = IDWiseStepCallbacks(
       onStepCaptured: (dynamic response) {
+        GlobxpayAuthSdkPlatform.instance.changeLoading(
+          true,
+          onLoading: (bool isLoading) {
+            if (mounted) {
+              setState(() {});
+            }
+          },
+        );
         print("stepCallbacks re $response");
         print("Method: onStepCaptured, ${response["stepId"]}");
         print("Method: capturedImage, ${response["capturedImage"]}");
@@ -533,13 +550,20 @@ class _RegistrationCycleScreenState extends State<RegistrationCycleScreen> {
         onStepCapturedprint();
       },
       onStepResult: (dynamic response) async {
-        await getJourneySummary();
-        print("Method: onStepResult, $response");
-        final StepResultModel stepResultModel = StepResultModel.fromJson(
-          response,
+        GlobxpayAuthSdkPlatform.instance.changeLoading(
+          true,
+          onLoading: (bool isLoading) {
+            if (mounted) {
+              setState(() {});
+            }
+          },
         );
-        onStepResultprint(data: response, status: "onStepResult");
         try {
+          print("Method: onStepResult, $response");
+          final StepResultModel stepResultModel = StepResultModel.fromJson(
+            response,
+          );
+          onStepResultprint(data: response, status: "onStepResult");
           // Parse the response into a type-safe model
           // Perform the action based on stepId
           switch (stepResultModel.stepId) {
@@ -716,6 +740,14 @@ class _RegistrationCycleScreenState extends State<RegistrationCycleScreen> {
           await getJourneySummary();
         } catch (e) {
           print("Error in handleStepResult: $e");
+          GlobxpayAuthSdkPlatform.instance.changeLoading(
+            false,
+            onLoading: (bool isLoading) {
+              if (mounted) {
+                setState(() {});
+              }
+            },
+          );
         }
       },
       onStepCancelled: (dynamic response) async {

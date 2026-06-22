@@ -1,7 +1,6 @@
 import 'package:globxpay_auth_sdk/globxpay_auth_sdk_platform_interface.dart';
 import 'package:globxpay_auth_sdk/widget/button.dart';
 
-import '../api/network.dart';
 import '../constants/app_assets.dart';
 import '../language_manager.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +10,12 @@ import 'package:sizer/sizer.dart';
 class SuccessfullyCreatedAccountScreen extends StatefulWidget {
   const SuccessfullyCreatedAccountScreen({
     super.key,
-    //this.isFirstTimeLogin = false,
+    this.isFirstTimeLogin = false,
   });
+
+  /// When true this success screen belongs to the first-time-login flow and its
+  /// "back to first screen" button drives [firstTimeLoginPageController].
+  final bool isFirstTimeLogin;
 
   @override
   State<SuccessfullyCreatedAccountScreen> createState() =>
@@ -60,8 +63,15 @@ class _SuccessfullyCreatedAccountScreenState
                 child: CustomButton(
                   text: LanguageManager.getText('backToFirstScreen'),
                   onPressed: () {
-                    GlobxpayAuthSdkPlatform.instance.registrationPageController
-                        .jumpToPage(0);
+                    if (widget.isFirstTimeLogin) {
+                      GlobxpayAuthSdkPlatform
+                          .instance
+                          .firstTimeLoginPageController
+                          .jumpToPage(0);
+                    } else {
+                      GlobxpayAuthSdkPlatform.instance.registrationPageController
+                          .jumpToPage(0);
+                    }
                   },
                 ),
               ),

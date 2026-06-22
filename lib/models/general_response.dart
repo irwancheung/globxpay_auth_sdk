@@ -1,3 +1,4 @@
+import '../init_sdk_model.dart';
 import '../language_manager.dart';
 
 class GeneralResponseModel {
@@ -49,8 +50,8 @@ class Errors {
 
   Errors({this.code, this.isoCode});
 
-  getDescription() {
-    if (LanguageManager.currentLanguage == 'en') {
+  String getDescription() {
+    if (LanguageManager.currentLanguage == GlobXLanguage.en) {
       return _description ?? 'Something went wrong';
     } else {
       return _descriptionAr ?? 'لقد حدث خطأ ما';

@@ -22,14 +22,16 @@ class _SuccessfullyTakenSelfiePassportState
     extends State<SuccessfullyTakenSelfiePassport> {
   @override
   void initState() {
-    GlobxpayAuthSdkPlatform.instance.changeLoading(
-      false,
-      onLoading: (bool isLoading) {
-        if (mounted) {
-          setState(() {});
-        }
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GlobxpayAuthSdkPlatform.instance.changeLoading(
+        false,
+        onLoading: (bool isLoading) {
+          if (mounted) {
+            setState(() {});
+          }
+        },
+      );
+    });
     super.initState();
   }
 

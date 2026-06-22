@@ -18,7 +18,7 @@ dependencies:
   talker_dio_logger: ^5.1.17
   animated_snack_bar: any
   intl: any
-  idwise_flutter_sdk: ^6.6.2
+  idwise_flutter_sdk: ^6.7.6
   intl_phone_field: ^3.2.0
   lottie: any
   mixpanel_flutter: ^2.8.0

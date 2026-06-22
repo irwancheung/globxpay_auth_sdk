@@ -24,15 +24,16 @@ final class Recaptcha {
     BuildContext context, {
     Function()? onSuccess,
     Function(String error)? onError,
+    Function(bool isLoading)? onLoading,
   }) async {
     await showModalBottomSheet(
       isDismissible: true,
       backgroundColor: AppColors.white,
       isScrollControlled: true,
       context: context,
-      builder: (context) {
+      builder: (sheetContext) {
         return SizedBox(
-          height: MediaQuery.sizeOf(context).height - 200,
+          height: MediaQuery.sizeOf(sheetContext).height - 200,
           child: Container(
             alignment: Alignment.topCenter,
             margin: const EdgeInsets.only(top: 20),
@@ -44,6 +45,9 @@ final class Recaptcha {
                 log('------------------');
 
                 if (value.isNotEmpty) {
+                  // Pop the bottom sheet first so the user returns to the registration screen
+                  Navigator.pop(sheetContext);
+
                   // Validate recaptcha token using SDK
                   print(
                     '🔵 About to call recaptchaValidate on platform instance',
@@ -56,7 +60,6 @@ final class Recaptcha {
                     token: value,
                     onSuccess: (isSuccess) {
                       log('✅ RECAPTCHA VERIFIED: $isSuccess');
-                      Navigator.pop(context);
                       // Call success callback
                       if (onSuccess != null) {
                         onSuccess();
@@ -64,9 +67,8 @@ final class Recaptcha {
                     },
                     onError: (error) {
                       log('❌ RECAPTCHA ERROR: $error');
-                      Navigator.pop(context);
 
-                      // Show error to user
+                      // Show error to user using host context
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text(error)));
@@ -78,6 +80,9 @@ final class Recaptcha {
                     },
                     onLoading: (isLoading) {
                       log('⏳ RECAPTCHA LOADING: $isLoading');
+                      if (onLoading != null) {
+                        onLoading(isLoading);
+                      }
                     },
                   );
                 }

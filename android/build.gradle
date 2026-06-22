@@ -6,6 +6,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://mobile-sdk.idwise.ai/releases/" }
     }
 
     dependencies {
@@ -18,6 +20,35 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url 'https://jitpack.io'
+            content {
+                includeGroup "com.github.florent37"
+            }
+        }
+        maven {
+            url 'https://fpjs.jfrog.io/artifactory/maven'
+            content {
+                includeGroup "com.fingerprint.android"
+            }
+        }
+        maven {
+            url 'https://cashshield-sdk.s3.amazonaws.com/release/'
+            content {
+                includeGroup "com.shield.android"
+                includeGroup "com.shield.android.module"
+            }
+        }
+        maven {
+            url 'https://mobile-sdk.idwise.ai/releases/'
+            content {
+                includeGroup "com.idwise"
+                includeGroup "com.shield.android"
+                includeGroup "com.shield.android.module"
+                includeGroup "com.fingerprint.android"
+                includeGroup "com.github.florent37"
+            }
+        }
     }
 }
 

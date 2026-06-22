@@ -1,5 +1,6 @@
 import '../constants/app_colors.dart';
 import '../globxpay_auth_sdk_platform_interface.dart';
+import '../init_sdk_model.dart';
 import '../language_manager.dart';
 import '../utils/dialogs.dart';
 import '../widget/button.dart';
@@ -161,7 +162,7 @@ class _TermsAndConditionScreenState extends State<TermsAndConditionScreen> {
 
   Future<void> _loadData() async {
     final lang = LanguageManager.currentLanguage;
-    final assetPath = lang == "en"
+    final assetPath = lang == GlobXLanguage.en
         ? "packages/globxpay_auth_sdk/assets/terms_and_conditions/terms_and_conditions_en.txt"
         : "packages/globxpay_auth_sdk/assets/terms_and_conditions/terms_and_conditions_ar.txt";
 

@@ -2,6 +2,31 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io") {
+            content {
+                includeGroup("com.github.florent37")
+            }
+        }
+        maven("https://fpjs.jfrog.io/artifactory/maven") {
+            content {
+                includeGroup("com.fingerprint.android")
+            }
+        }
+        maven("https://cashshield-sdk.s3.amazonaws.com/release/") {
+            content {
+                includeGroup("com.shield.android")
+                includeGroup("com.shield.android.module")
+            }
+        }
+        maven("https://mobile-sdk.idwise.ai/releases/") {
+            content {
+                includeGroup("com.idwise")
+                includeGroup("com.shield.android")
+                includeGroup("com.shield.android.module")
+                includeGroup("com.fingerprint.android")
+                includeGroup("com.github.florent37")
+            }
+        }
     }
 }
 

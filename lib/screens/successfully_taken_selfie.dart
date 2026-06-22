@@ -21,14 +21,16 @@ class _SuccessfullyTakenSelfieScreenState
   @override
   void initState() {
     super.initState();
-    GlobxpayAuthSdkPlatform.instance.changeLoading(
-      false,
-      onLoading: (bool isLoading) {
-        if (mounted) {
-          setState(() {});
-        }
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GlobxpayAuthSdkPlatform.instance.changeLoading(
+        false,
+        onLoading: (bool isLoading) {
+          if (mounted) {
+            setState(() {});
+          }
+        },
+      );
+    });
   }
 
   @override

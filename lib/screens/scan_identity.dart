@@ -17,8 +17,6 @@ class ScanIdentityScreen extends StatefulWidget {
 }
 
 class _ScanIdentityScreenState extends State<ScanIdentityScreen> {
-  bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -35,96 +33,94 @@ class _ScanIdentityScreenState extends State<ScanIdentityScreen> {
     const double smallSpacing = 2.0;
     const double tinySpacing = 1.0;
 
-    return Stack(
-      children: [
-        Scaffold(
-          body: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 10.h),
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        SizedBox(height: mediumSpacing.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: horizontalPadding.h,
-                          ),
-                          child: ImageBuilder(
-                            image: AppAssets.firstStepRegisterSVG,
-                            package: 'globxpay_auth_sdk',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        SizedBox(height: smallSpacing.h),
-                        Text(LanguageManager.getText('ScanYourID')),
-                        SizedBox(height: mediumSpacing.h),
-                        Column(
-                          children:
-                              GlobxpayAuthSdkPlatform
-                                  .instance
-                                  .registrationDocumentType
-                                  ?.images
-                                  .map((image) {
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: horizontalPadding.h,
-                                        vertical: tinySpacing.h,
-                                      ),
-                                      child: ImageBuilder(
-                                        image: image,
-                                        package: 'globxpay_auth_sdk',
-                                        fit: BoxFit.contain,
-                                      ),
-                                    );
-                                  })
-                                  .toList() ??
-                              [],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(mediumSpacing.h),
-                          child: Text(
-                            LanguageManager.getText(
-                              'positionTheFrontSideOfYourIDInTheFrameThenFlipItToScanBackSide',
+    return ValueListenableBuilder<bool>(
+      valueListenable: GlobxpayAuthSdkPlatform.instance.sdkLoading,
+      builder: (context, sdkLoading, child) {
+        return Stack(
+          children: [
+            Scaffold(
+              body: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: 10.h),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            SizedBox(height: mediumSpacing.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: horizontalPadding.h,
+                              ),
+                              child: ImageBuilder(
+                                image: AppAssets.firstStepRegisterSVG,
+                                package: 'globxpay_auth_sdk',
+                                fit: BoxFit.fill,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: smallSpacing.h),
+                            Text(LanguageManager.getText('ScanYourID')),
+                            SizedBox(height: mediumSpacing.h),
+                            Column(
+                              children:
+                                  GlobxpayAuthSdkPlatform
+                                      .instance
+                                      .registrationDocumentType
+                                      ?.images
+                                      .map((image) {
+                                        return Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: horizontalPadding.h,
+                                            vertical: tinySpacing.h,
+                                          ),
+                                          child: ImageBuilder(
+                                            image: image,
+                                            package: 'globxpay_auth_sdk',
+                                            fit: BoxFit.contain,
+                                          ),
+                                        );
+                                      })
+                                      .toList() ??
+                                  [],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(mediumSpacing.h),
+                              child: Text(
+                                LanguageManager.getText(
+                                  'positionTheFrontSideOfYourIDInTheFrameThenFlipItToScanBackSide',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding.h,
+                      ),
+                      child: CustomButton(
+                        text: LanguageManager.getText('scan'),
+                        onPressed: () async {
+                          try {
+                            await widget.resumeJourney();
+                          } catch (e) {
+                            // Handled inside
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(height: largeSpacing.h),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding.h,
-                  ),
-                  child: CustomButton(
-                    text: LanguageManager.getText('scan'),
-                    onPressed: () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      try {
-                        await widget.resumeJourney();
-                      } finally {
-                        if (mounted) {
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        }
-                      }
-                    },
-                  ),
-                ),
-                SizedBox(height: largeSpacing.h),
-              ],
+              ),
             ),
-          ),
-        ),
-        if (_isLoading) const LoaderWidget(),
-      ],
+            if (sdkLoading) const LoaderWidget(),
+          ],
+        );
+      },
     );
   }
 }
