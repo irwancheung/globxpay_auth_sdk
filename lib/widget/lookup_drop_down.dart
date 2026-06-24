@@ -26,7 +26,7 @@ class _LookupDropDownWidgetState extends State<LookupDropDownWidget> {
         value: selectedValue,
         items: widget.list
             .map(
-              (e) => DropdownItem(
+              (e) => DropdownMenuItem(
                 value: e.id,
                 child: Text(
                   LanguageManager.currentLanguage.toString() == 'ar'

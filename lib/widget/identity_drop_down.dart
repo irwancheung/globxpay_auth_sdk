@@ -1,9 +1,11 @@
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
 import '../language_manager.dart';
 import '../models/get_lookup_details.dart';
+
 
 class IdentityDropDownWidget extends StatefulWidget {
   const IdentityDropDownWidget({
@@ -30,10 +32,10 @@ class _KycDropDownWidgetState extends State<IdentityDropDownWidget> {
         value: selectedValue,
         items: widget.answers
             .map(
-              (e) => DropdownItem(
+              (e) => DropdownMenuItem(
                 value: e.id ?? 0,
                 child: Text(
-                  LanguageManager.currentLanguage == 'ar'
+                 LanguageManager.currentLanguage == 'ar'
                       ? e.arabicDisplayName ?? ''
                       : e.englishDisplayName ?? '',
                 ),
@@ -71,6 +73,7 @@ class _KycDropDownWidgetState extends State<IdentityDropDownWidget> {
           maxHeight: 200,
           width: double.infinity,
           decoration: BoxDecoration(
+            
             borderRadius: BorderRadius.circular(14),
             color: Colors.white,
           ),
