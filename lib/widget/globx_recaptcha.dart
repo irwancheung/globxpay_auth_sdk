@@ -22,63 +22,77 @@ class GlobXRecaptcha extends StatefulWidget {
 
 class _GlobXRecaptchaState extends State<GlobXRecaptcha> {
   bool _isLoading = true;
+  InAppWebViewController? _controller;
 
-  // @override
-  // void initState() {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //     //await _localhostServer.start();
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   });
-  //   super.initState();
-  // }
-
-  // @override
-  // void dispose() {
-  //   //_localhostServer.close();
-  //   super.dispose();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    log("[GlobX Recaptcha] Initializing ReCAPTCHA widget");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        InAppWebView(
-          initialUrlRequest: URLRequest(
-            url: WebUri.uri(
-              Uri.parse(
-                "https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=${widget.apiKey}",
+        AbsorbPointer(
+          absorbing: _isLoading,
+          child: InAppWebView(
+            initialUrlRequest: URLRequest(
+              url: WebUri.uri(
+                Uri.parse(
+                  "https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=${widget.apiKey}",
+                ),
               ),
             ),
-          ),
-          initialSettings: InAppWebViewSettings(
-            javaScriptEnabled: true,
-            transparentBackground: true,
-          ),
-          onWebViewCreated: (controller) {},
-          onLoadStop: (controller, url) {
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onLoadStart: (controller, url) {
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onConsoleMessage: (controller, consoleMessage) {
-            log("[GlobX Recaptcha] consoleMessage ${consoleMessage.message}");
-            if (consoleMessage.messageLevel == ConsoleMessageLevel.LOG &&
-                // Verifying if the string is a token or not.
-                consoleMessage.message.length > 70) {
-              String token = consoleMessage.message;
-              if (token.contains('verify')) {
-                token = token.substring(7);
+            initialSettings: InAppWebViewSettings(
+              javaScriptEnabled: true,
+              transparentBackground: true,
+              domStorageEnabled: true,
+              supportZoom: true,
+            ),
+            onWebViewCreated: (controller) {
+              _controller = controller;
+              log("[GlobX Recaptcha] WebView created");
+            },
+            onLoadStop: (controller, url) {
+              log("[GlobX Recaptcha] onLoadStop: $url");
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
               }
-              widget.onVerifiedSuccessfully?.call(token);
-            }
-          },
+            },
+            onLoadStart: (controller, url) {
+              log("[GlobX Recaptcha] onLoadStart: $url");
+              if (mounted) {
+                setState(() {
+                  _isLoading = true;
+                });
+              }
+            },
+            onConsoleMessage: (controller, consoleMessage) {
+              log("[GlobX Recaptcha] consoleMessage: [${consoleMessage.messageLevel}] ${consoleMessage.message}");
+              
+              final message = consoleMessage.message;
+              // Check for token - usually a long string. 
+              // ReCAPTCHA v2 tokens are typically > 300 chars, but > 70 is a safe start.
+              if (message.length > 70) {
+                log("[GlobX Recaptcha] Potential token received, length: ${message.length}");
+                String token = message;
+                if (token.contains('verify')) {
+                  token = token.substring(7);
+                  log("[GlobX Recaptcha] Token stripped of 'verify' prefix");
+                }
+                widget.onVerifiedSuccessfully?.call(token);
+              }
+            },
+            onReceivedError: (controller, request, error) {
+              log("[GlobX Recaptcha] Error: ${error.description}");
+            },
+            onReceivedHttpError: (controller, request, errorResponse) {
+              log("[GlobX Recaptcha] HTTP Error: ${errorResponse.statusCode}");
+            },
+          ),
         ),
         if (_isLoading)
           Center(

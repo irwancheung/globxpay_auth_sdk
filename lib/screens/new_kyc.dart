@@ -128,6 +128,49 @@ class _NewKycScreenState extends State<NewKycScreen> {
           if (sections != null) {
             kycModel = sections.map((s) => Sections.fromJson(s)).toList();
             originalKycModel = kycModel;
+
+            final model = GetKycModel.fromJson(kycData);
+            if (model.emailAddress != null && model.emailAddress!.isNotEmpty) {
+              emailCtrl.text = model.emailAddress!;
+            }
+            if (model.sectorId != null && model.sectorId != 0) {
+              sectorsId = model.sectorId!;
+            }
+            if (model.usagePurposeId != null && model.usagePurposeId != 0) {
+              purposeOfOpeninigId = model.usagePurposeId!;
+            }
+            if (model.countryId != null && model.countryId != 0) {
+              countryId = model.countryId!;
+            }
+            if (model.cityId != null && model.cityId != 0) {
+              cityId = model.cityId!;
+            }
+
+            if (model.isActualBeneficiary != null) {
+              isRealBeneficiary = model.isActualBeneficiary!;
+            }
+            if (model.actualBeneficiary != null) {
+              nameOfActualBeneficary.text =
+                  model.actualBeneficiary?.beneficiaryName ?? '';
+              relationshipOfActualBeneficary.text =
+                  model.actualBeneficiary?.beneficiaryRelation ?? '';
+              selectedIdType =
+                  model.actualBeneficiary?.beneficiaryIdentityTypeId ?? 0;
+
+              if (selectedIdType != 0) {
+                final idTypeQuestion = _getQuestionByCode(_qCodeIdTypeQuestion);
+                _beneficiaryIdTypeAnswerCode =
+                    _getAnswerCode(idTypeQuestion, selectedIdType) ?? '';
+              }
+
+              frontProofImage =
+                  model.actualBeneficiary?.front ??
+                  model.actualBeneficiary?.passport ??
+                  '';
+              backProofImage = model.actualBeneficiary?.back ?? '';
+            }
+
+            _checkAndInitializePrefilledData();
           }
         });
       },
@@ -147,6 +190,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
       onSuccess: (sectors) {
         setState(() {
           _sectorsData = sectors;
+          _checkAndInitializePrefilledData();
         });
       },
       onError: (error) {
@@ -165,6 +209,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
       onSuccess: (purposeList) {
         setState(() {
           _purposeOfOpeningData = purposeList;
+          _checkAndInitializePrefilledData();
         });
       },
       onError: (error) {
@@ -176,6 +221,130 @@ class _NewKycScreenState extends State<NewKycScreen> {
         });
       },
     );
+  }
+
+  void _checkAndInitializePrefilledData() {
+    if (kycModel != null &&
+        _sectorsData != null &&
+        _purposeOfOpeningData != null) {
+      log(
+        'KYC: All data loaded. Prefilled Top-level Fields: Email: ${emailCtrl.text}, SectorId: $sectorsId, PurposeId: $purposeOfOpeninigId, CountryId: $countryId, CityId: $cityId',
+      );
+
+      // Verify lookups
+      if (sectorsId != 0) {
+        final match = _sectorsData!.any((e) => e['id'] == sectorsId);
+        if (!match) {
+          log('KYC Warning: sectorId $sectorsId not found in lookup list');
+          sectorsId = 0;
+        }
+      }
+      if (purposeOfOpeninigId != 0) {
+        final match = _purposeOfOpeningData!.any(
+          (e) => e['id'] == purposeOfOpeninigId,
+        );
+        if (!match) {
+          log(
+            'KYC Warning: purposeOfOpeninigId $purposeOfOpeninigId not found in lookup list',
+          );
+          purposeOfOpeninigId = 0;
+        }
+      }
+
+      _initializeAnswersFromModel();
+    }
+  }
+
+  void _initializeAnswersFromModel() {
+    log('KYC: Initializing answers from model...');
+
+    // Clear existing to avoid duplicates if called multiple times
+    answers.clear();
+
+    for (final section in kycModel ?? <Sections>[]) {
+      final questions = section.kycSection?.kycQuestions ?? <KycQuestions>[];
+      for (final q in questions) {
+        final question = q.kycQuestion;
+        if (question == null) continue;
+
+        // Check for selected answers in the kyc model (lookups/radio)
+        final selectedAnswer =
+            question.answers
+                ?.firstWhere(
+                  (a) => a.kycAnswer?.isSelected == true,
+                  orElse: () => Answers(),
+                )
+                .kycAnswer;
+
+        if (selectedAnswer != null && selectedAnswer.id != null) {
+          log(
+            'KYC Initialized Field: ${question.engishDisplayName} (Code: ${question.code}), Displayed: ${selectedAnswer.englishDisplayName}, Selected ID: ${selectedAnswer.id}',
+          );
+          _addSelectedAnswer(question, selectedAnswer.id!);
+
+          // Also set specific state variables used for branching logic
+          if (question.code == '1') {
+            residentId = selectedAnswer.id!;
+            isResidentInJordan = _getAnswerCode(question, residentId) == '1';
+          }
+          if (question.code == '14') {
+            professionalStatusId = selectedAnswer.id!;
+            final answerCode = _getAnswerCode(question, professionalStatusId);
+            if (answerCode == '15') {
+              isStudent = false;
+            } else if (answerCode == '16') {
+              isStudent = true;
+            }
+          }
+          if (question.code == '17') {
+            gender = selectedAnswer.id!;
+          }
+        }
+
+        // Check for text answers
+        if (question.userAnswer != null &&
+            question.userAnswer!.trim().isNotEmpty) {
+          log(
+            'KYC Initialized Text Field: ${question.engishDisplayName} (Code: ${question.code}), User Answer: ${question.userAnswer}',
+          );
+          _addTextAnswer(question, question.userAnswer!);
+        }
+      }
+    }
+
+    // Add beneficiary answers if not the actual beneficiary
+    if (!isRealBeneficiary) {
+      final idTypeQuestion = _getQuestionByCode(_qCodeIdTypeQuestion);
+      if (idTypeQuestion != null && selectedIdType != 0) {
+        log('KYC Initialized Beneficiary ID Type: $selectedIdType');
+        answers.add(
+          KycAnswerModel(selectedIdType, idTypeQuestion.kycQuestionId ?? 0),
+        );
+      }
+
+      final nameQuestion = _getQuestionByCode(_qCodeNameQuestion);
+      if (nameQuestion != null && nameOfActualBeneficary.text.isNotEmpty) {
+        log(
+          'KYC Initialized Beneficiary Name: ${nameOfActualBeneficary.text}',
+        );
+        _addTextAnswer(nameQuestion, nameOfActualBeneficary.text);
+      }
+    }
+
+    // Process deduplicated answers for validation and submission
+    final Map<int, KycAnswerModel> latestByQuestion = <int, KycAnswerModel>{};
+    for (final answer in answers) {
+      final questionId = answer.questionId;
+      if (questionId == null) continue;
+      latestByQuestion[questionId] = answer;
+    }
+    deduplicatedAnswers = latestByQuestion.values.toList();
+
+    log(
+      'KYC: Initialization complete. Total prefilled answers: ${deduplicatedAnswers.length}',
+    );
+
+    if (mounted) setState(() {});
   }
 
   @override
@@ -333,6 +502,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
   Widget _buildSelectionQuestion({
     required KycQuestion? question,
     required ValueChanged<int> onChanged,
+    int? initialValue,
   }) {
     if (question?.isActive != true) {
       return const SizedBox.shrink();
@@ -352,11 +522,13 @@ class _NewKycScreenState extends State<NewKycScreen> {
           KycDropDownWidget(
             answers: question?.answers ?? [],
             onChanged: (id) => onChanged(id ?? 0),
+            initialValue: initialValue,
           )
         else
           NewRadioButtonWidget(
             answers: question?.answers ?? [],
             selectedData: onChanged,
+            initialValue: initialValue,
           ),
       ],
     );
@@ -433,35 +605,38 @@ class _NewKycScreenState extends State<NewKycScreen> {
   }
 
   Widget _buildTextQuestion(KycQuestion? question) {
-    return Visibility(
-      visible:
-          question?.code != _qCodeProofQuestion && question?.isActive == true,
-      child: TextFormField(
-        onTapOutside: (_) {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        obscureText: false,
-        style: const TextStyle(color: AppColors.black),
-        keyboardType: TextInputType.text,
-        cursorColor: AppColors.primary,
-        onChanged: (value) => _addTextAnswer(question, value),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: AppColors.inputBackground,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(1.2.h),
-            borderSide: const BorderSide(color: AppColors.textGrey),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 2.w),
-          hintText: _questionDisplayName(question),
-          hintStyle: const TextStyle(color: AppColors.textGrey),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: AppColors.white),
-            borderRadius: BorderRadius.all(Radius.circular(1.2.h)),
-          ),
-          border: const OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.white),
-          ),
+    if (question?.isActive != true || question?.code == _qCodeProofQuestion) {
+      return const SizedBox.shrink();
+    }
+
+    final initialValue = question?.userAnswer;
+
+    return TextFormField(
+      onTapOutside: (_) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      initialValue: initialValue,
+      obscureText: false,
+      style: const TextStyle(color: AppColors.black),
+      keyboardType: TextInputType.text,
+      cursorColor: AppColors.primary,
+      onChanged: (value) => _addTextAnswer(question, value),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColors.inputBackground,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(1.2.h),
+          borderSide: const BorderSide(color: AppColors.textGrey),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 2.w),
+        hintText: _questionDisplayName(question),
+        hintStyle: const TextStyle(color: AppColors.textGrey),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.white),
+          borderRadius: BorderRadius.all(Radius.circular(1.2.h)),
+        ),
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.white),
         ),
       ),
     );
@@ -473,6 +648,15 @@ class _NewKycScreenState extends State<NewKycScreen> {
       return const SizedBox.shrink();
     }
 
+    final initialValue =
+        question.answers
+            ?.firstWhere(
+              (a) => a.kycAnswer?.isSelected == true,
+              orElse: () => Answers(),
+            )
+            .kycAnswer
+            ?.id;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -480,6 +664,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
         SizedBox(height: 1.h),
         KycDropDownWidget(
           answers: question.answers ?? [],
+          initialValue: initialValue,
           onChanged: (id) {
             answers.add(KycAnswerModel(id, question.kycQuestionId ?? 0));
           },
@@ -500,11 +685,21 @@ class _NewKycScreenState extends State<NewKycScreen> {
       idForRadioButton.add(question.kycQuestionId ?? 0);
     }
 
+    final initialValue =
+        question.answers
+            ?.firstWhere(
+              (a) => a.kycAnswer?.isSelected == true,
+              orElse: () => Answers(),
+            )
+            .kycAnswer
+            ?.id;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildQuestionTitle(question),
         NewRadioButtonWidget(
+          initialValue: initialValue,
           selectedData: (answerId) => _addSelectedAnswer(question, answerId),
           answers: question.answers ?? [],
         ),
@@ -666,6 +861,8 @@ class _NewKycScreenState extends State<NewKycScreen> {
                   ),
                 ),
                 DropDownCountriesCitiesWidget(
+                  startCountyId: countryId != 0 ? countryId : null,
+                  startCityId: cityId != 0 ? cityId : null,
                   countryId: (id) {
                     setState(() {
                       countryId = id;
@@ -683,6 +880,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
                 /// Are You a resident of Jordan?
                 _buildSelectionQuestion(
                   question: residentQuestion,
+                  initialValue: residentId != 0 ? residentId : null,
                   onChanged: (id) {
                     setState(() {
                       residentId = id;
@@ -699,6 +897,8 @@ class _NewKycScreenState extends State<NewKycScreen> {
                 if (isResidentInJordan)
                   _buildSelectionQuestion(
                     question: residentCountryQuestion,
+                    initialValue:
+                        residentCountryId != 0 ? residentCountryId : null,
                     onChanged: (id) {
                       setState(() {
                         residentCountryId = id;
@@ -709,6 +909,8 @@ class _NewKycScreenState extends State<NewKycScreen> {
                 /// Professional Status
                 _buildSelectionQuestion(
                   question: professionalStatusQuestion,
+                  initialValue:
+                      professionalStatusId != 0 ? professionalStatusId : null,
                   onChanged: (id) {
                     setState(() {
                       professionalStatusId = id;
@@ -728,6 +930,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
                 /// Gender
                 _buildSelectionQuestion(
                   question: genderQuestion,
+                  initialValue: gender != 0 ? gender : null,
                   onChanged: (id) {
                     setState(() {
                       gender = id;
@@ -948,6 +1151,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
           SizedBox(height: 1.h),
           KycDropDownWidget(
             answers: idTypeQuestion.answers ?? [],
+            initialValue: selectedIdType != 0 ? selectedIdType : null,
             onChanged: (id) {
               final answerCode = _getAnswerCode(idTypeQuestion, id ?? 0);
               answers.add(
@@ -1594,8 +1798,9 @@ class _NewKycScreenState extends State<NewKycScreen> {
     }
 
     for (var answer in deduplicatedAnswers) {
+      final question = _getQuestionById(answer.questionId ?? 0);
       log(
-        "AnswerId: ${answer.answerId}, QuestionId: ${answer.questionId}, FreeText: ${answer.freeText}",
+        "KYC SUBMIT PAYLOAD: Question: ${question?.engishDisplayName} (ID: ${answer.questionId}), AnswerId: ${answer.answerId}, FreeText: ${answer.freeText}",
       );
     }
 
@@ -1899,6 +2104,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
                   ?.map((e) => ResultLookupsDetails.fromJson(e))
                   .toList() ??
               [],
+          initialValue: sectorsId != 0 ? sectorsId : null,
           onChanged: (id) {
             setState(() {
               sectorsId = id ?? 0;
@@ -1941,6 +2147,7 @@ class _NewKycScreenState extends State<NewKycScreen> {
                   ?.map((e) => ResultLookupsDetails.fromJson(e))
                   .toList() ??
               [],
+          initialValue: purposeOfOpeninigId != 0 ? purposeOfOpeninigId : null,
           onChanged: (id) {
             setState(() {
               purposeOfOpeninigId = id ?? 0;

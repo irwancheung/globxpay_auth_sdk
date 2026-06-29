@@ -10,10 +10,12 @@ class KycDropDownWidget extends StatefulWidget {
     super.key,
     required this.answers,
     required this.onChanged,
+    this.initialValue,
   });
 
   final List<Answers> answers;
   final Function(int?) onChanged;
+  final int? initialValue;
 
   @override
   State<KycDropDownWidget> createState() => _KycDropDownWidgetState();
@@ -21,6 +23,20 @@ class KycDropDownWidget extends StatefulWidget {
 
 class _KycDropDownWidgetState extends State<KycDropDownWidget> {
   int? selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(KycDropDownWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      selectedValue = widget.initialValue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

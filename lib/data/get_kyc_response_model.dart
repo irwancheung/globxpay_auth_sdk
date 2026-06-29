@@ -7,6 +7,13 @@ class GetKycModel {
   String? code;
   String? message;
   int? languageTypeId;
+  int? sectorId;
+  int? usagePurposeId;
+  int? countryId;
+  int? cityId;
+  String? emailAddress;
+  bool? isActualBeneficiary;
+  ActualBeneficiary? actualBeneficiary;
 
   GetKycModel({
     this.sections,
@@ -15,6 +22,13 @@ class GetKycModel {
     this.code,
     this.message,
     this.languageTypeId,
+    this.sectorId,
+    this.usagePurposeId,
+    this.countryId,
+    this.cityId,
+    this.emailAddress,
+    this.isActualBeneficiary,
+    this.actualBeneficiary,
   });
 
   GetKycModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +48,15 @@ class GetKycModel {
     code = json['code'];
     message = json['message'];
     languageTypeId = json['languageTypeId'];
+    sectorId = json['sectorId'];
+    usagePurposeId = json['usagePurposeId'];
+    countryId = json['countryId'];
+    cityId = json['cityId'];
+    emailAddress = json['emailAddress'];
+    isActualBeneficiary = json['isAcutalBeneficiary'];
+    actualBeneficiary = json['actualBeneficiary'] != null
+        ? ActualBeneficiary.fromJson(json['actualBeneficiary'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -48,6 +71,53 @@ class GetKycModel {
     data['code'] = code;
     data['message'] = message;
     data['languageTypeId'] = languageTypeId;
+    data['sectorId'] = sectorId;
+    data['usagePurposeId'] = usagePurposeId;
+    data['countryId'] = countryId;
+    data['cityId'] = cityId;
+    data['emailAddress'] = emailAddress;
+    data['isAcutalBeneficiary'] = isActualBeneficiary;
+    if (actualBeneficiary != null) {
+      data['actualBeneficiary'] = actualBeneficiary!.toJson();
+    }
+    return data;
+  }
+}
+
+class ActualBeneficiary {
+  String? beneficiaryName;
+  int? beneficiaryIdentityTypeId;
+  String? front;
+  String? back;
+  String? passport;
+  String? beneficiaryRelation;
+
+  ActualBeneficiary({
+    this.beneficiaryName,
+    this.beneficiaryIdentityTypeId,
+    this.front,
+    this.back,
+    this.passport,
+    this.beneficiaryRelation,
+  });
+
+  ActualBeneficiary.fromJson(Map<String, dynamic> json) {
+    beneficiaryName = json['beneficiaryName'];
+    beneficiaryIdentityTypeId = json['beneficiaryIdentityTypeId'];
+    front = json['front'];
+    back = json['back'];
+    passport = json['passport'];
+    beneficiaryRelation = json['beneficiaryRelation'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['beneficiaryName'] = beneficiaryName;
+    data['beneficiaryIdentityTypeId'] = beneficiaryIdentityTypeId;
+    data['front'] = front;
+    data['back'] = back;
+    data['passport'] = passport;
+    data['beneficiaryRelation'] = beneficiaryRelation;
     return data;
   }
 }

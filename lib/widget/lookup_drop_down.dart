@@ -6,10 +6,16 @@ import '../language_manager.dart';
 import '../models/get_lookup_details.dart';
 
 class LookupDropDownWidget extends StatefulWidget {
-  const LookupDropDownWidget({super.key, this.onChanged, required this.list});
+  const LookupDropDownWidget({
+    super.key,
+    this.onChanged,
+    required this.list,
+    this.initialValue,
+  });
 
   final Function(int?)? onChanged;
   final List<ResultLookupsDetails> list;
+  final int? initialValue;
 
   @override
   State<LookupDropDownWidget> createState() => _LookupDropDownWidgetState();
@@ -17,6 +23,20 @@ class LookupDropDownWidget extends StatefulWidget {
 
 class _LookupDropDownWidgetState extends State<LookupDropDownWidget> {
   int? selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(LookupDropDownWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      selectedValue = widget.initialValue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

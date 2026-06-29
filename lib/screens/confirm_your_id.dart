@@ -1,13 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 import '../constants/app_assets.dart';
 import '../constants/app_colors.dart';
-import '../globxpay_auth_sdk_platform_interface.dart';
+
 import '../image_builder.dart';
 import '../language_manager.dart';
 import '../registration_data.dart';
 import '../utils/dialogs.dart';
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+
+import '../globxpay_auth_sdk_platform_interface.dart';
+import '../registration_data.dart';
 
 class ConfirmYourIdScreen extends StatefulWidget {
   const ConfirmYourIdScreen({super.key, this.isRegister = true});
@@ -78,11 +81,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                     SizedBox(height: 1.h),
                     _buildDocumentNumber(),
                     const SizedBox(height: 10),
-                    GlobxpayAuthSdkPlatform
-                                .instance
-                                .registrationDocumentType
-                                ?.id ==
-                            3
+                    GlobxpayAuthSdkPlatform.instance.registrationDocumentType?.id == 3
                         ? const SizedBox()
                         : Text(
                             LanguageManager.getText('nationalNumber'),
@@ -92,11 +91,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                               fontSize: 12.0.sp,
                             ),
                           ),
-                    GlobxpayAuthSdkPlatform
-                                .instance
-                                .registrationDocumentType
-                                ?.id ==
-                            3
+                    GlobxpayAuthSdkPlatform.instance.registrationDocumentType?.id == 3
                         ? const SizedBox()
                         : Text(
                             RegistrationData.getnationalNumber(),
@@ -106,11 +101,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                               fontSize: 12.0.sp,
                             ),
                           ),
-                    GlobxpayAuthSdkPlatform
-                                .instance
-                                .registrationDocumentType
-                                ?.id ==
-                            3
+                    GlobxpayAuthSdkPlatform.instance.registrationDocumentType?.id == 3
                         ? const SizedBox()
                         : Divider(
                             color: AppColors.primary,
@@ -133,18 +124,13 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                         fontSize: 12.0.sp,
                       ),
                     ),
-                    Divider(
-                      color: AppColors.primary,
-                      height: 4.h,
-                      thickness: 1,
-                    ),
+                    Divider(color: AppColors.primary, height: 4.h, thickness: 1),
                     Column(
                       children: [
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(2.h),
-                            child:
-                                RegistrationData.getdocImageFront().isNotEmpty
+                            child: RegistrationData.getdocImageFront().isNotEmpty
                                 ? ImageBuilder(
                                     image: RegistrationData.getdocImageFront(),
                                     height: 25.h,
@@ -158,7 +144,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                         SizedBox(height: 2.h),
                         Visibility(
                           visible:
-                              GlobxpayAuthSdkPlatform
+                          GlobxpayAuthSdkPlatform
                                       .instance
                                       .registrationDocumentType
                                       ?.id ==
@@ -168,8 +154,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                           child: Center(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(2.h),
-                              child:
-                                  RegistrationData.getdocImageBack().isNotEmpty
+                              child: RegistrationData.getdocImageBack().isNotEmpty
                                   ? ImageBuilder(
                                       image: RegistrationData.getdocImageBack(),
                                       height: 25.h,
@@ -240,9 +225,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
                                 //   return;
                                 // }
 
-                                if (palaceOfBirthController.text
-                                    .trim()
-                                    .isEmpty) {
+                                if (palaceOfBirthController.text.trim().isEmpty) {
                                   Dialogs.errorDialog(
                                     context,
                                     barrierDismissible: true,
@@ -283,8 +266,7 @@ class _ConfirmYourIdScreenState extends State<ConfirmYourIdScreen> {
 
   Widget _buildDocumentNumber() {
     return Visibility(
-      visible:
-          GlobxpayAuthSdkPlatform.instance.registrationDocumentType?.id != 5,
+      visible: GlobxpayAuthSdkPlatform.instance.registrationDocumentType?.id != 5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

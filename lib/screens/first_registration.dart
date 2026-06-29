@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:globxpay_auth_sdk/utils/dialogs.dart';
 import 'package:globxpay_auth_sdk/utils/phone_number_lengths.dart';
-import 'package:sizer/sizer.dart';
 
+import '../api/network.dart';
 import '../constants/app_assets.dart';
 import '../constants/app_colors.dart';
 import '../globxpay_auth_sdk_platform_interface.dart';
@@ -17,6 +15,8 @@ import '../utils/recaptcha.dart';
 import '../widget/button.dart';
 import '../widget/text_phone_field.dart';
 import '../widget/waiting_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class FirstRegistrationScreen extends StatefulWidget {
   const FirstRegistrationScreen({super.key});
@@ -260,10 +260,11 @@ class _FirstRegistrationScreenState extends State<FirstRegistrationScreen> {
 
             GlobxpayAuthSdkPlatform.instance.getOtpMethodLookup(
               onSuccess: (list) {
+            
                 // _callRegisterStepOne();
                 Dialogs.showChannelSelectionDialog(
                   context,
-                  channels: list,
+                  channels:list,
                   onChannelSelected: (selectedChannel) {
                     // Handle the selected channel here
                     log(
