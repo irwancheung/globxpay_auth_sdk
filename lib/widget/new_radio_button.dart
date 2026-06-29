@@ -9,10 +9,12 @@ class NewRadioButtonWidget extends StatefulWidget {
     super.key,
     required this.selectedData,
     required this.answers,
+    this.initialValue,
   });
 
   final List<Answers> answers;
   final Function(int aId) selectedData;
+  final int? initialValue;
 
   @override
   State<NewRadioButtonWidget> createState() => _NewRadioButtonWidgetState();
@@ -20,6 +22,20 @@ class NewRadioButtonWidget extends StatefulWidget {
 
 class _NewRadioButtonWidgetState extends State<NewRadioButtonWidget> {
   int? selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(NewRadioButtonWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      selectedValue = widget.initialValue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -240,6 +240,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
   void setupCallbacks() {
     _journeyCallbacks = IDWiseJourneyCallbacks(
       onJourneyStarted: (dynamic journeyInfo) {
+        debugPrint('FirstTimeLoginCycle: Journey Started (global loading true)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           true,
           onLoading: (_) {
@@ -254,7 +255,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         _navigateStep('10');
       },
       onJourneyCompleted: (dynamic journeyInfo) {
-        debugPrint('onJourneyCompleted: $journeyInfo');
+        debugPrint('FirstTimeLoginCycle: Journey Completed (global loading false)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           false,
           onLoading: (_) {
@@ -263,7 +264,13 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         );
       },
       onJourneyCancelled: (dynamic journeyInfo) {
-        debugPrint('onJourneyCancelled: $journeyInfo');
+        debugPrint('FirstTimeLoginCycle: Journey Cancelled (global loading false)');
+        GlobxpayAuthSdkPlatform.instance.changeLoading(
+          false,
+          onLoading: (_) {
+            if (mounted) setState(() {});
+          },
+        );
         context.read<JourneyStateManager>().setJourneyId('');
         unloadSDK();
         clearSaved();
@@ -271,7 +278,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
             .jumpToPage(_documentTypePage);
       },
       onJourneyResumed: (dynamic journeyInfo) {
-        debugPrint('Method: onJourneyResumed, ${journeyInfo["journeyId"]}');
+        debugPrint('FirstTimeLoginCycle: Journey Resumed: ${journeyInfo["journeyId"]} (global loading true)');
         context.read<JourneyStateManager>().setJourneyId('');
         unloadSDK();
         clearSaved();
@@ -287,6 +294,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         getJourneySummary();
       },
       onError: (dynamic error) {
+        debugPrint('FirstTimeLoginCycle: Journey Error: $error (global loading false)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           false,
           onLoading: (_) {
@@ -311,11 +319,12 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         });
       },
       onJourneyBlocked: (dynamic journeyBlockedInfo) =>
-          debugPrint('onJourneyBlocked: $journeyBlockedInfo'),
+          debugPrint('FirstTimeLoginCycle: Journey Blocked: $journeyBlockedInfo'),
     );
 
     _stepCallbacks = IDWiseStepCallbacks(
       onStepCaptured: (dynamic response) {
+        debugPrint('FirstTimeLoginCycle: Step Captured: ${response['stepId']} (global loading true)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           true,
           onLoading: (_) {
@@ -338,6 +347,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         }
       },
       onStepResult: (dynamic response) async {
+        debugPrint('FirstTimeLoginCycle: Step Result received (global loading true)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           true,
           onLoading: (_) {
@@ -373,7 +383,13 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         }
       },
       onStepCancelled: (dynamic response) async {
-        debugPrint('Method: onStepCancelled, $response');
+        debugPrint('FirstTimeLoginCycle: Step Cancelled (global loading false)');
+        GlobxpayAuthSdkPlatform.instance.changeLoading(
+          false,
+          onLoading: (_) {
+            if (mounted) setState(() {});
+          },
+        );
         context.read<JourneyStateManager>().setJourneyId('');
         unloadSDK();
         clearSaved();
@@ -381,7 +397,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
             .jumpToPage(_documentTypePage);
       },
       onStepSkipped: (dynamic response) async {
-        debugPrint('Method: onStepSkipped, $response');
+        debugPrint('FirstTimeLoginCycle: Step Skipped (global loading false)');
         GlobxpayAuthSdkPlatform.instance.changeLoading(
           false,
           onLoading: (_) {
@@ -525,6 +541,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
 
   Future<void> resumeJourney() async {
     try {
+      debugPrint('FirstTimeLoginCycle: Resuming journey (global loading true)');
       context.read<JourneyStateManager>().setJourneyStatus(false);
       GlobxpayAuthSdkPlatform.instance.changeLoading(
         true,
@@ -541,6 +558,7 @@ class _FirstTimeLoginCycleScreenState extends State<FirstTimeLoginCycleScreen> {
         resumeDynamicJourney(journeyId);
       }
     } on PlatformException catch (e) {
+      debugPrint("FirstTimeLoginCycle: Resume Journey PlatformException: '${e.message}' (global loading false)");
       GlobxpayAuthSdkPlatform.instance.changeLoading(
         false,
         onLoading: (_) {

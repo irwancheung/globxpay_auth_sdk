@@ -39,34 +39,29 @@ final class Recaptcha {
             margin: const EdgeInsets.only(top: 20),
             child: GlobXRecaptcha(
               onVerifiedSuccessfully: (value) async {
-                log('Token When Complete:');
-                log('------------------');
-                log(value);
-                log('------------------');
+                log('🔵 [Recaptcha Utils] Token received from WebView, length: ${value.length}');
 
                 if (value.isNotEmpty) {
                   // Pop the bottom sheet first so the user returns to the registration screen
-                  Navigator.pop(sheetContext);
+                  if (Navigator.canPop(sheetContext)) {
+                    log('🔵 [Recaptcha Utils] Popping ReCAPTCHA bottom sheet');
+                    Navigator.pop(sheetContext);
+                  }
 
                   // Validate recaptcha token using SDK
-                  print(
-                    '🔵 About to call recaptchaValidate on platform instance',
-                  );
-                  print(
-                    '🔵 Platform instance type: ${GlobxpayAuthSdkPlatform.instance.runtimeType}',
-                  );
+                  log('🔵 [Recaptcha Utils] Calling recaptchaValidate on platform instance');
 
                   GlobxpayAuthSdkPlatform.instance.recaptchaValidate(
                     token: value,
                     onSuccess: (isSuccess) {
-                      log('✅ RECAPTCHA VERIFIED: $isSuccess');
+                      log('✅ [Recaptcha Utils] RECAPTCHA VERIFIED: $isSuccess');
                       // Call success callback
                       if (onSuccess != null) {
                         onSuccess();
                       }
                     },
                     onError: (error) {
-                      log('❌ RECAPTCHA ERROR: $error');
+                      log('❌ [Recaptcha Utils] RECAPTCHA ERROR: $error');
 
                       // Show error to user using host context
                       ScaffoldMessenger.of(
@@ -79,12 +74,14 @@ final class Recaptcha {
                       }
                     },
                     onLoading: (isLoading) {
-                      log('⏳ RECAPTCHA LOADING: $isLoading');
+                      log('⏳ [Recaptcha Utils] RECAPTCHA LOADING: $isLoading');
                       if (onLoading != null) {
                         onLoading(isLoading);
                       }
                     },
                   );
+                } else {
+                  log('⚠️ [Recaptcha Utils] Received empty token from ReCAPTCHA');
                 }
               },
               apiKey: Network.config['RECAPTCHA_API_KEY'] ?? '',

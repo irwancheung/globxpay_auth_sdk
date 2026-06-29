@@ -13,11 +13,13 @@ class DropDownCountriesCitiesWidget extends StatefulWidget {
     required this.countryId,
     required this.cityId,
     this.startCountyId,
+    this.startCityId,
   });
 
   final Function(int) countryId;
   final Function(int) cityId;
   final int? startCountyId;
+  final int? startCityId;
 
   @override
   State<DropDownCountriesCitiesWidget> createState() =>
@@ -38,11 +40,29 @@ class _DropDownCountriesCitiesWidgetState
   @override
   void initState() {
     super.initState();
-    if (widget.startCountyId == null) {
-      _loadCountries();
-    } else {
+    if (widget.startCountyId != null) {
       selectedCountriesValue = widget.startCountyId;
-      _loadCities(selectedCountriesValue ?? 1);
+      _loadCities(selectedCountriesValue!);
+    }
+    if (widget.startCityId != null) {
+      selectedCitiesValue = widget.startCityId;
+    }
+    _loadCountries();
+  }
+
+  @override
+  void didUpdateWidget(DropDownCountriesCitiesWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.startCountyId != oldWidget.startCountyId && widget.startCountyId != null) {
+      setState(() {
+        selectedCountriesValue = widget.startCountyId;
+        _loadCities(selectedCountriesValue!);
+      });
+    }
+    if (widget.startCityId != oldWidget.startCityId && widget.startCityId != null) {
+      setState(() {
+        selectedCitiesValue = widget.startCityId;
+      });
     }
   }
 
@@ -144,14 +164,11 @@ class _DropDownCountriesCitiesWidgetState
         borderRadius: BorderRadius.circular(1.2.h),
       ),
       child: SearchableDropdown<int>(
-        hasTrailingClearIcon: widget.startCountyId == null,
-        trailingIcon: widget.startCountyId == null
-            ? Icon(
-                Icons.keyboard_arrow_down,
-                size: 24,
-                color: AppColors.primary,
-              )
-            : const SizedBox.shrink(),
+        trailingIcon: Icon(
+          Icons.keyboard_arrow_down,
+          size: 24,
+          color: AppColors.primary,
+        ),
         items: List.generate(_countries?.length ?? 0, (i) {
           final country = _countries![i];
           return SearchableDropdownMenuItem(
@@ -167,7 +184,6 @@ class _DropDownCountriesCitiesWidgetState
           );
         }),
         value: selectedCountriesValue,
-        isEnabled: widget.startCountyId == null,
         onChanged: (id) {
           widget.countryId(id ?? 0);
           setState(() {

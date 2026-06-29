@@ -34,17 +34,20 @@ class _FtlFirstStepScreenState extends State<FtlFirstStepScreen> {
   @override
   void initState() {
     phoneNumberController = TextEditingController();
+    log('🔵 [FTL Step 1] Screen initialized');
     super.initState();
   }
 
   @override
   void dispose() {
     phoneNumberController.dispose();
+    log('🔵 [FTL Step 1] Screen disposed');
     super.dispose();
   }
 
   void _setLoading(bool isLoading) {
     if (!mounted) return;
+    log('🔵 [FTL Step 1] Setting main loading: $isLoading');
     setState(() {
       _isLoading = isLoading;
     });
@@ -52,20 +55,24 @@ class _FtlFirstStepScreenState extends State<FtlFirstStepScreen> {
 
   void _setRecaptchaLoading(bool isLoading) {
     if (!mounted) return;
+    log('🔵 [FTL Step 1] Setting ReCAPTCHA loading: $isLoading');
     setState(() {
       _isRecaptchaLoading = isLoading;
     });
   }
 
   void _callFirstTimeLoginStepOne() {
+    log('🔵 [FTL Step 1] Calling firstTimeLogin API');
     GlobxpayAuthSdkPlatform.instance.firstTimeLogin(
       phoneNumber: RegistrationData.getPhoneNumber(),
       stepId: 1,
       onSuccess: (_) {
+        log('✅ [FTL Step 1] firstTimeLogin API success');
         GlobxpayAuthSdkPlatform.instance.firstTimeLoginPageController
             .jumpToPage(1);
       },
       onError: (error) {
+        log('❌ [FTL Step 1] firstTimeLogin API error: $error');
         Dialogs.errorDialog(context, message: error);
       },
       onLoading: _setLoading,
@@ -220,25 +227,35 @@ class _FtlFirstStepScreenState extends State<FtlFirstStepScreen> {
   }
 
   Future<void> onEnterMobileNumber() async {
+    if (_isLoading || _isRecaptchaLoading) {
+      log('⚠️ [FTL Step 1] Click ignored: already loading');
+      return;
+    }
+
+    log('🔵 [FTL Step 1] "Next" button clicked');
     FocusScope.of(context).requestFocus(FocusNode());
     if (_formKey.currentState!.validate() &&
         phoneNumberController.text.trim().isNotEmpty) {
-      RegistrationData.setPhoneNumber(
-        '$countryCode${phoneNumberController.text.trim()}'.replaceFirst(
+      final fullPhone = '$countryCode${phoneNumberController.text.trim()}'.replaceFirst(
           '+',
           '00',
-        ),
-      );
+        );
+      log('🔵 [FTL Step 1] Validated phone: $fullPhone');
+      RegistrationData.setPhoneNumber(fullPhone);
 
+      log('🔵 [FTL Step 1] Showing ReCAPTCHA modal');
       await Recaptcha().showRecaptcha(
         context,
         onSuccess: () {
+          log('✅ [FTL Step 1] ReCAPTCHA success callback');
           GlobxpayAuthSdkPlatform.instance.getOtpMethodLookup(
             onSuccess: (channels) {
+              log('✅ [FTL Step 1] getOtpMethodLookup success, channels: ${channels.length}');
               Dialogs.showChannelSelectionDialog(
                 context,
                 channels: channels,
                 onChannelSelected: (selectedChannel) {
+                  log('🔵 [FTL Step 1] Channel selected: ${selectedChannel.englishDisplayName}');
                   GlobxpayAuthSdkPlatform.instance.selectedChannelMethod =
                       (LanguageManager.currentLanguage == GlobXLanguage.ar
                           ? selectedChannel.arabicDisplayName
@@ -256,16 +273,26 @@ class _FtlFirstStepScreenState extends State<FtlFirstStepScreen> {
               );
             },
             onError: (error, _) {
+              log('❌ [FTL Step 1] getOtpMethodLookup error: $error');
               Dialogs.errorDialog(context, message: error);
             },
             onLoading: _setLoading,
           );
         },
         onError: (error) {
-          log('Recaptcha validation failed: $error');
+          log('❌ [FTL Step 1] ReCAPTCHA error callback: $error');
+          _setRecaptchaLoading(false);
         },
         onLoading: _setRecaptchaLoading,
       );
+
+      // Ensure loading is reset if user closes the modal without completing
+      if (_isRecaptchaLoading) {
+        log('🔵 [FTL Step 1] ReCAPTCHA modal closed, resetting loading state');
+        _setRecaptchaLoading(false);
+      }
+    } else {
+      log('⚠️ [FTL Step 1] Form validation failed');
     }
   }
 }

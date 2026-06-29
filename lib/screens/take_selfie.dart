@@ -39,7 +39,7 @@ class _TakeSelfieScreenState extends State<TakeSelfieScreen> {
   static const STEP_SELFIE = '20';
 
   Future<void> _navigateStep(String stepId) async {
-    log("StepId: $stepId");
+    debugPrint('TakeSelfieScreen: Starting take selfie step: $stepId (global loading false)');
     GlobxpayAuthSdkPlatform.instance.changeLoading(
       false,
       onLoading: (bool isLoading) {
@@ -53,70 +53,60 @@ class _TakeSelfieScreenState extends State<TakeSelfieScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: GlobxpayAuthSdkPlatform.instance.sdkLoading,
-      builder: (context, sdkLoading, child) {
-        return Stack(
-          children: [
-            Scaffold(
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.h),
-                    child: ImageBuilder(
-                      image: AppAssets.thirdStepRegisterSVG,
-                      package: 'globxpay_auth_sdk',
-                      fit: BoxFit.fill,
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.h),
+            child: ImageBuilder(
+              image: AppAssets.thirdStepRegisterSVG,
+              package: 'globxpay_auth_sdk',
+              fit: BoxFit.fill,
+            ),
+          ),
+          SizedBox(height: 5.h),
+          Text(LanguageManager.getText("letSayGlobXpayPay")),
+          SizedBox(height: 3.h),
+          ImageBuilder(
+            image: AppAssets.scanSelfieCircle,
+            package: 'globxpay_auth_sdk',
+          ),
+          SizedBox(height: 3.h),
+          Consumer<JourneyStateManager>(
+            builder: (context, store, child) {
+              return FractionallySizedBox(
+                widthFactor: 0.5,
+                child: Material(
+                  elevation: 1.0,
+                  borderRadius: BorderRadius.circular(1.2.h),
+                  color: AppColors.primary,
+                  child: MaterialButton(
+                    height: 6.5.h,
+                    minWidth: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.fromLTRB(
+                      20.0,
+                      15.0,
+                      20.0,
+                      15.0,
+                    ),
+                    onPressed: () {
+                      _navigateStep(STEP_SELFIE);
+                    },
+                    child: Text(
+                      LanguageManager.getText('takePicture'),
+                      style: const TextStyle(
+                        color: AppColors.textGreyDark,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  SizedBox(height: 5.h),
-                  Text(LanguageManager.getText("letSayGlobXpayPay")),
-                  SizedBox(height: 3.h),
-                  ImageBuilder(
-                    image: AppAssets.scanSelfieCircle,
-                    package: 'globxpay_auth_sdk',
-                  ),
-                  SizedBox(height: 3.h),
-                  Consumer<JourneyStateManager>(
-                    builder: (context, store, child) {
-                      return FractionallySizedBox(
-                        widthFactor: 0.5,
-                        child: Material(
-                          elevation: 1.0,
-                          borderRadius: BorderRadius.circular(1.2.h),
-                          color: AppColors.primary,
-                          child: MaterialButton(
-                            height: 6.5.h,
-                            minWidth: MediaQuery.of(context).size.width,
-                            padding: const EdgeInsets.fromLTRB(
-                              20.0,
-                              15.0,
-                              20.0,
-                              15.0,
-                            ),
-                            onPressed: () {
-                              _navigateStep(STEP_SELFIE);
-                            },
-                            child: Text(
-                              LanguageManager.getText('takePicture'),
-                              style: const TextStyle(
-                                color: AppColors.textGreyDark,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            if (sdkLoading) const LoaderWidget(),
-          ],
-        );
-      },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
