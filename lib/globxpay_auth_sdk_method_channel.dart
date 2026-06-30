@@ -477,6 +477,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
       // Build the complete data map matching the cubit implementation
       var data = {
         "otpMethodCode": GlobxpayAuthSdkPlatform.instance.codeMethod ?? 0,
+        "applicationId": Network.applicationId,
         "firstNameEn": firstNameEn.trim(),
         "secondNameEn": secondNameEn.trim(),
         "thirdNameEn": thirdNameEn.trim(),
@@ -486,7 +487,6 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
         "thirdNameAr": thirdNameAr.trim(),
         "lastNameAr": lastNameAr.trim(),
         "password": password.trim(),
-        "applicationId": Network.applicationId,
         "stepId": stepId,
         "street": street.trim(),
         "address": address.trim(),
@@ -1138,6 +1138,7 @@ class MethodChannelGlobxpayAuthSdk extends GlobxpayAuthSdkPlatform {
         'submitKYC': submitKYCList,
         'cityId': cityId,
         'countryId': countryId,
+        "applicationId": Network.applicationId,
         'idNumber': idNumber.trim(),
         'userId': userId,
         'phoneNumber': phoneNumber.trim(),
